@@ -6,7 +6,6 @@ import androidx.annotation.IntDef
 import splitties.init.appCtx
 import java.io.*
 import java.nio.charset.Charset
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 
@@ -622,9 +621,7 @@ object FileUtils {
      * 获取格式化后的文件/目录创建或最后修改时间
      */
     fun getDateTime(file: File, format: String): String {
-        val cal = Calendar.getInstance()
-        cal.timeInMillis = file.lastModified()
-        return SimpleDateFormat(format, Locale.PRC).format(cal.time)
+        return file.lastModified().dateFormat(format, Locale.PRC)
     }
 
     /**

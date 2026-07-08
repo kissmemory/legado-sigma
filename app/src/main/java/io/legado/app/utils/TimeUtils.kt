@@ -1,6 +1,25 @@
 package io.legado.app.utils
 
+import android.annotation.SuppressLint
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.math.abs
+
+/**
+ * 将时间戳按指定格式格式化
+ */
+@SuppressLint("SimpleDateFormat")
+fun Long.dateFormat(pattern: String, locale: Locale = Locale.getDefault()): String {
+    return SimpleDateFormat(pattern, locale).format(Date(this))
+}
+
+/**
+ * 将当前时间按指定格式格式化
+ */
+fun currentTimeFormat(pattern: String, locale: Locale = Locale.getDefault()): String {
+    return System.currentTimeMillis().dateFormat(pattern, locale)
+}
 
 fun Long.toTimeAgo(): String {
     val curTime = System.currentTimeMillis()
