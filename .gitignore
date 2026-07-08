@@ -18,3 +18,8 @@ package-lock.json
 .kotlin/
 .cxx
 .vscode
+# Signing keys / keystores must never be committed
+*.jks
+*.keystore
+key.jks
+legado.jks

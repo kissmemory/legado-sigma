@@ -140,7 +140,11 @@ class HttpServer(port: Int) : NanoHTTPD(port) {
             LogUtils.d(TAG) {
                 "${session.method.name} - $uri - ${session.queryParameterString} - Error End($startAt)\n$e\n${e.stackTraceStr}"
             }
-            return newFixedLengthResponse(e.message)
+            return newFixedLengthResponse(
+                Response.Status.INTERNAL_ERROR,
+                MIME_PLAINTEXT,
+                "Internal Server Error"
+            )
         }
 
     }
