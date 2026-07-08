@@ -12,6 +12,7 @@ import io.legado.app.help.source.SourceHelp
 import io.legado.app.utils.FileUtils
 import io.legado.app.utils.GSON
 import io.legado.app.utils.cnCompare
+import io.legado.app.utils.currentTimeFormat
 import io.legado.app.utils.normalizeFileName
 import io.legado.app.utils.outputStream
 import io.legado.app.utils.splitNotBlank
@@ -20,8 +21,6 @@ import io.legado.app.utils.toastOnUi
 import io.legado.app.utils.writeToOutputStream
 import splitties.init.appCtx
 import java.io.File
-import java.util.Date
-import java.util.Locale
 
 /**
  * 书源管理数据修改
@@ -167,7 +166,7 @@ class BookSourceViewModel(application: Application) : BaseViewModel(application)
             val name = if (selectionSize == 1) {
                 "bookSource_${selection.first().bookSourceName.normalizeFileName()}.json"
             } else {
-                val timestamp = java.text.SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault()).format(Date())
+                val timestamp = currentTimeFormat("yyyyMMddHHmm")
                 "bookSource_$timestamp.json"
             }
             saveToFile(sources, name, success)

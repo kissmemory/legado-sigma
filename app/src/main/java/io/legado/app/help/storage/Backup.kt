@@ -21,6 +21,7 @@ import io.legado.app.utils.GSON
 import io.legado.app.utils.LogUtils
 import io.legado.app.utils.compress.ZipUtils
 import io.legado.app.utils.createFolderIfNotExist
+import io.legado.app.utils.currentTimeFormat
 import io.legado.app.utils.defaultSharedPreferences
 import io.legado.app.utils.externalFiles
 import io.legado.app.utils.getFile
@@ -40,9 +41,6 @@ import splitties.init.appCtx
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.core.content.edit
 import io.legado.app.model.VideoPlay.VIDEO_PREF_NAME
@@ -90,8 +88,7 @@ object Backup {
     }
 
     private fun getNowZipFileName(): String {
-        val backupDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            .format(Date(System.currentTimeMillis()))
+        val backupDate = currentTimeFormat("yyyy-MM-dd")
         val deviceName = AppConfig.webDavDeviceName
         return if (deviceName?.isNotBlank() == true) {
             "backup${backupDate}-${deviceName}.zip"

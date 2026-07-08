@@ -8,12 +8,10 @@ import io.legado.app.data.appDb
 import io.legado.app.utils.FileDoc
 import io.legado.app.utils.GSON
 import io.legado.app.utils.createFileIfNotExist
+import io.legado.app.utils.currentTimeFormat
 import io.legado.app.utils.openOutputStream
 import io.legado.app.utils.toastOnUi
 import io.legado.app.utils.writeToOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class AllBookmarkViewModel(application: Application) : BaseViewModel(application) {
 
@@ -23,8 +21,7 @@ class AllBookmarkViewModel(application: Application) : BaseViewModel(application
      */
     fun exportBookmark(treeUri: Uri) {
         execute {
-            val dateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
-            val fileName = "bookmark-${dateFormat.format(Date())}.json"
+            val fileName = "bookmark-${currentTimeFormat("yyMMddHHmmss")}.json"
             val dirDoc = FileDoc.fromUri(treeUri, true)
             dirDoc.createFileIfNotExist(fileName).openOutputStream().getOrThrow().use {
                 GSON.writeToOutputStream(it, appDb.bookmarkDao.all)
@@ -39,8 +36,7 @@ class AllBookmarkViewModel(application: Application) : BaseViewModel(application
 
     fun exportBookmarkMd(treeUri: Uri) {
         execute {
-            val dateFormat = SimpleDateFormat("yyMMddHHmmss", Locale.getDefault())
-            val fileName = "bookmark-${dateFormat.format(Date())}.md"
+            val fileName = "bookmark-${currentTimeFormat("yyMMddHHmmss")}.md"
             val dirDoc = FileDoc.fromUri(treeUri, true)
             val fileDoc = dirDoc.createFileIfNotExist(fileName).openOutputStream().getOrThrow()
             fileDoc.use { outputStream ->
