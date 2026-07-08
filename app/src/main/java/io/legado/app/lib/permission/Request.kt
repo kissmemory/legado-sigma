@@ -7,6 +7,7 @@ import android.os.Environment
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import io.legado.app.constant.AppLog
 import io.legado.app.utils.startActivity
 import splitties.init.appCtx
 import splitties.systemservices.powerManager
@@ -150,7 +151,8 @@ internal class Request : OnRequestPermissionsResultCallback {
     private fun onPermissionsGranted() {
         try {
             grantedCallback?.onPermissionsGranted()
-        } catch (ignore: Exception) {
+        } catch (e: Exception) {
+            AppLog.put("权限授予回调出错", e)
         }
 
         RequestPlugins.sResultCallback?.onPermissionsGranted()
@@ -159,7 +161,8 @@ internal class Request : OnRequestPermissionsResultCallback {
     private fun onPermissionsDenied(deniedPermissions: Array<String>) {
         try {
             deniedCallback?.onPermissionsDenied(deniedPermissions)
-        } catch (ignore: Exception) {
+        } catch (e: Exception) {
+            AppLog.put("权限拒绝回调出错", e)
         }
 
         RequestPlugins.sResultCallback?.onPermissionsDenied(deniedPermissions)
