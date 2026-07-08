@@ -24,6 +24,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import com.google.gson.reflect.TypeToken
+import io.legado.app.constant.AppLog
 import io.legado.app.help.http.okHttpClient
 import io.legado.app.utils.GSON
 import io.legado.app.utils.externalCache
@@ -79,7 +80,8 @@ object ExoPlayerHelper {
                 try {
                     val headers: Map<String, String> = GSON.fromJson(urls[1], mapType)
                     okhttpDataFactory.setDefaultRequestProperties(headers)
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    AppLog.put("ExoPlayer解析请求头出错\n$url", e)
                 }
             }
 
