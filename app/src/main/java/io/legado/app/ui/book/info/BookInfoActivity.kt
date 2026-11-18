@@ -39,6 +39,7 @@ import io.legado.app.help.AppWebDav
 import io.legado.app.help.GlideImageGetter
 import io.legado.app.help.TextViewTagHandler
 import io.legado.app.help.WebCacheManager
+import io.legado.app.help.book.BookTitleHistory
 import io.legado.app.help.book.addType
 import io.legado.app.help.book.getRemoteUrl
 import io.legado.app.help.book.isAudio
@@ -540,7 +541,7 @@ class BookInfoActivity :
     }
 
     private fun showBookIntro(book: Book) {
-        val intro = book.getDisplayIntro()
+        val intro = BookTitleHistory.displayIntro(book, book.getDisplayIntro())
         if (intro?.startsWith("<useweb>") == true) {
             val lastIndex = intro.lastIndexOf("<")
             if (lastIndex < 8) {

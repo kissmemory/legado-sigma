@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-19",
+  "base_repository": "https://gitee.com/lyc486/legado",
+  "base_commit": "8b87c5aba4df91c39a3a0939a68a1180b9f2ee1c",
+  "apk": "Sigma-jj-identity-test-20261119.apk",
+  "apk_bytes": 38767518,
+  "apk_sha256": "4326eb39918ed0808ad5cdb5bfea71cd5b98a713a9f7bae22c49c430606ebbd5",
+  "package": "io.legado.app.jjidentitytest",
+  "version": "3.26.111901-jjid-test",
+  "signature_v1": true,
+  "signature_v2": true,
+  "certificate_sha256": "8c60657ba4986733fedcc51c157ed989bcf85d7a585713364239dc8ceff14031",
+  "tests": [
+    {
+      "name": "io.legado.app.help.book.JinjiangShelfIdentityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangTitleHistoryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "source_archive": "Sigma-jj-identity-test-source-20261119.zip",
+  "source_sha256": "ad8bfc75f6d4e82471cd8ac17c8a31751f0186a510a5f0ee6e24764764a16453",
+  "phone_installed": false,
+  "phone_shelf_modified": false,
+  "archive_branch": "custom/jj-identity-20261119",
+  "github_parent_commit": "44e07fea541287804cc58d0168940a756cd11cfd",
+  "apk_git_blob": "d7d938ef3ecef5de6fa54f561f8771b8463e1b48"
+}

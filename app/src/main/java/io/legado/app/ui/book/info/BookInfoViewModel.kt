@@ -21,6 +21,7 @@ import io.legado.app.exception.NoBooksDirException
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.help.AppWebDav
 import io.legado.app.help.book.BookHelp
+import io.legado.app.help.book.JinjiangShelfIdentity
 import io.legado.app.help.book.getExportFileName
 import io.legado.app.help.book.getRemoteUrl
 import io.legado.app.help.book.isLocal
@@ -74,6 +75,17 @@ class BookInfoViewModel(application: Application) : BaseViewModel(application) {
                     inBookshelf = !it.isNotShelf
                     upBook(it)
                     return@execute
+                }
+                // The discovery URL may differ from the saved source URL after a rename.
+                // Open the existing shelf record so its source, groups and progress survive.
+                JinjiangShelfIdentity.key(bookUrl)?.let { identity ->
+                    appDb.bookDao.all.firstOrNull {
+                        !it.isNotShelf && JinjiangShelfIdentity.key(it.bookUrl) == identity
+                    }?.let { saved ->
+                        inBookshelf = true
+                        upBook(saved)
+                        return@execute
+                    }
                 }
                 appDb.searchBookDao.getSearchBook(bookUrl)?.toBook()?.let {
                     upBook(it)

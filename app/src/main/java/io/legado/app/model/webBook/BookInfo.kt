@@ -5,6 +5,7 @@ import io.legado.app.R
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookSource
 import io.legado.app.exception.NoStackTraceException
+import io.legado.app.help.book.BookTitleHistory
 import io.legado.app.help.book.BookHelp
 import io.legado.app.help.book.isWebFile
 import io.legado.app.model.Debug
@@ -54,6 +55,8 @@ object BookInfo {
         redirectUrl: String,
         canReName: Boolean,
     ) {
+        val previousName = book.name
+        var observedName = ""
         val infoRule = bookSource.getBookInfoRule()
         infoRule.init?.let {
             if (it.isNotBlank()) {
@@ -66,6 +69,7 @@ object BookInfo {
         currentCoroutineContext().ensureActive()
         Debug.log(bookSource.bookSourceUrl, "┌获取书名")
         BookHelp.formatBookName(analyzeRule.getString(infoRule.name)).let {
+            observedName = it
             if (it.isNotEmpty() && (mCanReName || book.name.isEmpty())) {
                 book.name = it
             }
@@ -173,6 +177,7 @@ object BookInfo {
                 )
             }
         }
+        BookTitleHistory.observe(book, previousName, observedName)
     }
 
 }

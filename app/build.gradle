@@ -19,6 +19,8 @@ static def releaseTime() {
     return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+8"))
 }
 
+def jjIdentityTest = providers.gradleProperty("jjIdentityTest").map { it.toBoolean() }.getOrElse(false)
+
 def name = "legado"
 def version = "3." + releaseTime()
 def gitCommits = Integer.parseInt('git rev-list HEAD --count'.execute().text.trim())
@@ -96,8 +98,11 @@ android {
             }
             manifestPlaceholders.put("app_name", "@string/app_name")
 
-            applicationIdSuffix '.debug'
-            versionNameSuffix 'debug'
+            applicationIdSuffix jjIdentityTest ? '.jjidentitytest' : '.debug'
+            versionNameSuffix jjIdentityTest ? '-jjid-test' : 'debug'
+            if (jjIdentityTest) {
+                manifestPlaceholders.put("app_name", "Sigma 改名识别测试")
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'cronet-proguard-rules.pro'
         }
@@ -140,6 +145,7 @@ android {
     }
     packaging {
         resources.excludes.add('META-INF/*')
+        jniLibs.excludes.add('lib/*/librtmp-jni.so')
     }
 
     sourceSets {

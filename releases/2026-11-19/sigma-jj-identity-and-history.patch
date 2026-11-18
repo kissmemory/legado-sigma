@@ -1,0 +1,767 @@
+diff --git a/.gitignore b/.gitignore
+index d8b6882..f5f57ef 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -17,4 +17,6 @@ package-lock.json
+ # Kotlin 2.0
+ .kotlin/
+ .cxx
+-.vscode
+\ No newline at end of file
++.vscode
++.build-tools/
++.local-build/
+diff --git a/app/build.gradle b/app/build.gradle
+index 6eece86..f008a16 100644
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -19,6 +19,8 @@ static def releaseTime() {
+     return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+8"))
+ }
+ 
++def jjIdentityTest = providers.gradleProperty("jjIdentityTest").map { it.toBoolean() }.getOrElse(false)
++
+ def name = "legado"
+ def version = "3." + releaseTime()
+ def gitCommits = Integer.parseInt('git rev-list HEAD --count'.execute().text.trim())
+@@ -96,8 +98,11 @@ android {
+             }
+             manifestPlaceholders.put("app_name", "@string/app_name")
+ 
+-            applicationIdSuffix '.debug'
+-            versionNameSuffix 'debug'
++            applicationIdSuffix jjIdentityTest ? '.jjidentitytest' : '.debug'
++            versionNameSuffix jjIdentityTest ? '-jjid-test' : 'debug'
++            if (jjIdentityTest) {
++                manifestPlaceholders.put("app_name", "Sigma 改名识别测试")
++            }
+             minifyEnabled false
+             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'cronet-proguard-rules.pro'
+         }
+diff --git a/app/src/debug/google-services.json b/app/src/debug/google-services.json
+new file mode 100644
+index 0000000..4e1430a
+--- /dev/null
++++ b/app/src/debug/google-services.json
+@@ -0,0 +1,86 @@
++{
++  "project_info": {
++    "project_number": "697663952276",
++    "project_id": "legado-3222c",
++    "storage_bucket": "legado-3222c.firebasestorage.app"
++  },
++  "client": [
++    {
++      "client_info": {
++        "mobilesdk_app_id": "1:697663952276:android:c82ebb87ea51ffb03a2b81",
++        "android_client_info": {
++          "package_name": "io.legado.app.debug"
++        }
++      },
++      "oauth_client": [],
++      "api_key": [
++        {
++          "current_key": "AIzaSyDADkLR1qeagS7qJiaJ1CxINSqJWDWM6Hg"
++        }
++      ],
++      "services": {
++        "appinvite_service": {
++          "other_platform_oauth_client": []
++        }
++      }
++    },
++    {
++      "client_info": {
++        "mobilesdk_app_id": "1:697663952276:android:97b22ebf33dd827b3a2b81",
++        "android_client_info": {
++          "package_name": "io.legado.app.release"
++        }
++      },
++      "oauth_client": [],
++      "api_key": [
++        {
++          "current_key": "AIzaSyDADkLR1qeagS7qJiaJ1CxINSqJWDWM6Hg"
++        }
++      ],
++      "services": {
++        "appinvite_service": {
++          "other_platform_oauth_client": []
++        }
++      }
++    },
++    {
++      "client_info": {
++        "mobilesdk_app_id": "1:697663952276:android:9df7094e5a3fa0813a2b81",
++        "android_client_info": {
++          "package_name": "io.legado.app.releaseS"
++        }
++      },
++      "oauth_client": [],
++      "api_key": [
++        {
++          "current_key": "AIzaSyDADkLR1qeagS7qJiaJ1CxINSqJWDWM6Hg"
++        }
++      ],
++      "services": {
++        "appinvite_service": {
++          "other_platform_oauth_client": []
++        }
++      }
++    },
++    {
++      "client_info": {
++        "mobilesdk_app_id": "1:697663952276:android:c82ebb87ea51ffb03a2b81",
++        "android_client_info": {
++          "package_name": "io.legado.app.jjidentitytest"
++        }
++      },
++      "oauth_client": [],
++      "api_key": [
++        {
++          "current_key": "AIzaSyDADkLR1qeagS7qJiaJ1CxINSqJWDWM6Hg"
++        }
++      ],
++      "services": {
++        "appinvite_service": {
++          "other_platform_oauth_client": []
++        }
++      }
++    }
++  ],
++  "configuration_version": "1"
++}
+diff --git a/app/src/main/java/io/legado/app/help/book/BookTitleHistory.kt b/app/src/main/java/io/legado/app/help/book/BookTitleHistory.kt
+new file mode 100644
+index 0000000..d02ec3c
+--- /dev/null
++++ b/app/src/main/java/io/legado/app/help/book/BookTitleHistory.kt
+@@ -0,0 +1,49 @@
++package io.legado.app.help.book
++
++import androidx.annotation.Keep
++import io.legado.app.data.appDb
++import io.legado.app.data.entities.Book
++import io.legado.app.utils.GSON
++import io.legado.app.utils.fromJsonObject
++
++/** Stored in the existing book variables so normal backup/restore includes it. */
++object BookTitleHistory {
++    private const val VARIABLE = "__sigma_jj_title_history_v1"
++
++    @Keep
++    data class History(val identity: String, val titles: List<String>, val current: String)
++
++    private fun read(book: Book): History? {
++        val identity = JinjiangShelfIdentity.key(book.bookUrl) ?: return null
++        val history = GSON.fromJsonObject<History>(book.getVariable(VARIABLE)).getOrNull() ?: return null
++        return history.takeIf { it.identity == identity && !it.current.isNullOrBlank() && !it.titles.isNullOrEmpty() }
++    }
++
++    fun observe(book: Book, previousName: String, observedName: String) {
++        val identity = JinjiangShelfIdentity.key(book.bookUrl) ?: return
++        if (observedName.isBlank()) return
++        // A detail opened from discovery/search may have a fresh Book instance. Merge
++        // saved history by stable ID before that fresh instance can replace its variables.
++        val shelf = appDb.bookDao.all.filter {
++            !it.isNotShelf && JinjiangShelfIdentity.key(it.bookUrl) == identity
++        }
++        val seen = linkedSetOf<String>()
++        read(book)?.titles?.let(seen::addAll)
++        shelf.forEach { saved -> read(saved)?.titles?.let(seen::addAll) }
++        val seedName = shelf.firstOrNull { it.bookUrl == book.bookUrl }?.name
++            ?: shelf.firstOrNull()?.name ?: previousName
++        val titles = JinjiangTitleHistory.observe(seen.toList(), seedName, observedName)
++        book.putVariable(VARIABLE, GSON.toJson(History(identity, titles, observedName.trim())))
++    }
++
++    fun displayIntro(book: Book, intro: String?): String? {
++        val history = read(book) ?: return intro
++        return JinjiangTitleHistory.decorate(history.titles, history.current, intro)
++    }
++
++    fun copyFrom(source: Book, destination: Book) {
++        if (read(source) != null && JinjiangShelfIdentity.key(source.bookUrl) == JinjiangShelfIdentity.key(destination.bookUrl)) {
++            destination.putVariable(VARIABLE, source.getVariable(VARIABLE))
++        }
++    }
++}
+diff --git a/app/src/main/java/io/legado/app/help/book/JinjiangShelfIdentity.java b/app/src/main/java/io/legado/app/help/book/JinjiangShelfIdentity.java
+new file mode 100644
+index 0000000..ec13036
+--- /dev/null
++++ b/app/src/main/java/io/legado/app/help/book/JinjiangShelfIdentity.java
+@@ -0,0 +1,94 @@
++package io.legado.app.help.book;
++
++import java.net.URI;
++import java.net.URLDecoder;
++import java.util.Locale;
++import java.util.Collection;
++import java.util.Set;
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
++
++/** Extra identity for shelf indicators only. Never changes stored book data. */
++public final class JinjiangShelfIdentity {
++    private static final Pattern OPTIONS = Pattern.compile(",\\s*\\{");
++    private static final Pattern BRIDGE = Pattern.compile("^/truyen/jjwxc/[0-9]+/([0-9]+)/?$", Pattern.CASE_INSENSITIVE);
++
++    private JinjiangShelfIdentity() {}
++
++    public static void addKeys(Collection<String> keys, String name, String author, String bookUrl) {
++        keys.add(name + "-" + author);
++        keys.add(name);
++        keys.add(bookUrl);
++        String id = key(bookUrl);
++        if (id != null) keys.add(id);
++    }
++
++    public static boolean contains(Set<String> shelf, String name, String author, String bookUrl) {
++        String legacyKey = isBlank(author) ? name : name + "-" + author;
++        String id = key(bookUrl);
++        return shelf.contains(legacyKey) || shelf.contains(bookUrl) ||
++                (id != null && shelf.contains(id));
++    }
++
++    public static String key(String bookUrl) {
++        if (bookUrl == null || bookUrl.length() > 8192) return null;
++        try {
++            String url = bookUrl.trim();
++            Matcher options = OPTIONS.matcher(url);
++            if (options.find()) url = url.substring(0, options.start());
++            URI uri = new URI(url);
++            String scheme = uri.getScheme();
++            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) return null;
++            String host = uri.getHost();
++            if (host == null || uri.getRawUserInfo() != null) return null;
++            host = host.toLowerCase(Locale.ROOT);
++            String path = uri.getPath();
++            if (path == null) return null;
++            String id = null;
++            if (host.equals("jjwxc.net") || host.endsWith(".jjwxc.net") ||
++                    host.equals("jjwxc.org") || host.endsWith(".jjwxc.org")) {
++                if (!path.equalsIgnoreCase("/onebook.php") &&
++                        !path.equalsIgnoreCase("/androidapi/novelbasicinfo")) return null;
++                String query = uri.getRawQuery();
++                if (query == null) return null;
++                for (String part : query.split("&")) {
++                    int equals = part.indexOf('=');
++                    if (equals < 0) continue;
++                    String name = URLDecoder.decode(part.substring(0, equals), "UTF-8");
++                    if (!name.equalsIgnoreCase("novelid")) continue;
++                    String value = normalize(URLDecoder.decode(part.substring(equals + 1), "UTF-8"));
++                    if (value == null || (id != null && !id.equals(value))) return null;
++                    id = value;
++                }
++            } else if (host.equals("sangtacviet.app") || host.equals("sangtacviet.com")) {
++                Matcher bridge = BRIDGE.matcher(path);
++                if (!bridge.matches()) return null;
++                id = normalize(bridge.group(1));
++            }
++            return id == null ? null : "jjwxc:novel:" + id;
++        } catch (Exception ignored) {
++            // Bad or unrelated source URLs must not break a discovery/search result list.
++            return null;
++        }
++    }
++
++    private static boolean isBlank(String value) {
++        for (int i = 0; i < value.length(); i++) {
++            char c = value.charAt(i);
++            if (!Character.isWhitespace(c) && !Character.isSpaceChar(c)) return false;
++        }
++        return true;
++    }
++
++    private static String normalize(String id) {
++        if (id.isEmpty() || id.length() > 20) return null;
++        for (int i = 0; i < id.length(); i++) {
++            char c = id.charAt(i);
++            if (c < '0' || c > '9') return null;
++        }
++        int first = 0;
++        while (first < id.length() - 1 && id.charAt(first) == '0') first++;
++        id = id.substring(first);
++        return id.equals("0") ? null : id;
++    }
++}
+diff --git a/app/src/main/java/io/legado/app/help/book/JinjiangTitleHistory.java b/app/src/main/java/io/legado/app/help/book/JinjiangTitleHistory.java
+new file mode 100644
+index 0000000..559c0f3
+--- /dev/null
++++ b/app/src/main/java/io/legado/app/help/book/JinjiangTitleHistory.java
+@@ -0,0 +1,51 @@
++package io.legado.app.help.book;
++
++import java.util.ArrayList;
++import java.util.LinkedHashSet;
++import java.util.List;
++
++/** Pure presentation/history logic. Stored source intros never contain our prefix. */
++public final class JinjiangTitleHistory {
++    private JinjiangTitleHistory() {}
++
++    public static List<String> observe(List<String> seen, String shelfTitle, String currentTitle) {
++        if (currentTitle == null || currentTitle.trim().isEmpty()) return new ArrayList<>(seen);
++        LinkedHashSet<String> titles = new LinkedHashSet<>();
++        for (String title : seen) add(titles, title);
++        // Seed the shelf's existing title only once; later manual edits aren't new observations.
++        if (titles.isEmpty()) add(titles, shelfTitle);
++        add(titles, currentTitle);
++        return new ArrayList<>(titles);
++    }
++
++    public static String decorate(List<String> seen, String currentTitle, String intro) {
++        LinkedHashSet<String> former = new LinkedHashSet<>();
++        for (String title : seen) {
++            if (title != null && !title.trim().equals(currentTitle)) add(former, title);
++        }
++        if (former.isEmpty()) return intro;
++        String prefix = "曾用名：" + String.join("／", former);
++        String body = intro == null ? "" : intro;
++        if (body.startsWith("<usehtml>") || body.startsWith("<useweb>")) {
++            int end = body.indexOf('>') + 1;
++            return body.substring(0, end) + "<p>" + escapeHtml(prefix) + "</p>" + body.substring(end);
++        }
++        if (body.startsWith("<md>")) {
++            StringBuilder escaped = new StringBuilder();
++            for (char c : prefix.toCharArray()) {
++                if ("\\`*_{}[]<>()#+-.!|>".indexOf(c) >= 0) escaped.append('\\');
++                escaped.append(c);
++            }
++            return "<md>" + escaped + "\n\n" + body.substring(4);
++        }
++        return prefix + "\n\n" + body;
++    }
++
++    private static void add(LinkedHashSet<String> titles, String title) {
++        if (title != null && !title.trim().isEmpty()) titles.add(title.trim().replaceAll("[\\r\\n]+", " "));
++    }
++
++    private static String escapeHtml(String value) {
++        return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
++    }
++}
+diff --git a/app/src/main/java/io/legado/app/model/webBook/BookInfo.kt b/app/src/main/java/io/legado/app/model/webBook/BookInfo.kt
+index d24c17b..006f2d5 100644
+--- a/app/src/main/java/io/legado/app/model/webBook/BookInfo.kt
++++ b/app/src/main/java/io/legado/app/model/webBook/BookInfo.kt
+@@ -5,6 +5,7 @@ import io.legado.app.R
+ import io.legado.app.data.entities.Book
+ import io.legado.app.data.entities.BookSource
+ import io.legado.app.exception.NoStackTraceException
++import io.legado.app.help.book.BookTitleHistory
+ import io.legado.app.help.book.BookHelp
+ import io.legado.app.help.book.isWebFile
+ import io.legado.app.model.Debug
+@@ -54,6 +55,8 @@ object BookInfo {
+         redirectUrl: String,
+         canReName: Boolean,
+     ) {
++        val previousName = book.name
++        var observedName = ""
+         val infoRule = bookSource.getBookInfoRule()
+         infoRule.init?.let {
+             if (it.isNotBlank()) {
+@@ -66,6 +69,7 @@ object BookInfo {
+         currentCoroutineContext().ensureActive()
+         Debug.log(bookSource.bookSourceUrl, "┌获取书名")
+         BookHelp.formatBookName(analyzeRule.getString(infoRule.name)).let {
++            observedName = it
+             if (it.isNotEmpty() && (mCanReName || book.name.isEmpty())) {
+                 book.name = it
+             }
+@@ -173,6 +177,7 @@ object BookInfo {
+                 )
+             }
+         }
++        BookTitleHistory.observe(book, previousName, observedName)
+     }
+ 
+ }
+\ No newline at end of file
+diff --git a/app/src/main/java/io/legado/app/model/webBook/WebBook.kt b/app/src/main/java/io/legado/app/model/webBook/WebBook.kt
+index 32d0324..9de13d5 100644
+--- a/app/src/main/java/io/legado/app/model/webBook/WebBook.kt
++++ b/app/src/main/java/io/legado/app/model/webBook/WebBook.kt
+@@ -7,6 +7,8 @@ import io.legado.app.data.entities.BookSource
+ import io.legado.app.data.entities.BookSourcePart
+ import io.legado.app.data.entities.SearchBook
+ import io.legado.app.exception.NoStackTraceException
++import io.legado.app.help.book.BookTitleHistory
++import io.legado.app.help.book.JinjiangShelfIdentity
+ import io.legado.app.help.book.addType
+ import io.legado.app.help.book.removeAllBookType
+ import io.legado.app.help.coroutine.Coroutine
+@@ -290,6 +292,19 @@ object WebBook {
+         book.removeAllBookType()
+         book.addType(bookSource.getBookType())
+         return kotlin.runCatching {
++            // Chapter refresh also checks the current public intro/title. Keep errors isolated
++            // and retain the shelf name, progress, groups and handwritten intro.
++            if (!isFromBookInfo && JinjiangShelfIdentity.key(book.bookUrl) != null) {
++                try {
++                    val refreshed = book.copy().apply { infoHtml = null }
++                    getBookInfoAwait(bookSource, refreshed, canReName = false)
++                    book.intro = refreshed.intro
++                    BookTitleHistory.copyFrom(refreshed, book)
++                } catch (error: Exception) {
++                    currentCoroutineContext().ensureActive()
++                    AppLog.put("同步晋江文案失败，保留原文案：${error.localizedMessage}")
++                }
++            }
+             if (runPerJs) {
+                 runPreUpdateJs(bookSource, book, isFromBookInfo).getOrThrow()
+             }
+diff --git a/app/src/main/java/io/legado/app/ui/book/explore/ExploreShowViewModel.kt b/app/src/main/java/io/legado/app/ui/book/explore/ExploreShowViewModel.kt
+index f58fa54..344c79e 100644
+--- a/app/src/main/java/io/legado/app/ui/book/explore/ExploreShowViewModel.kt
++++ b/app/src/main/java/io/legado/app/ui/book/explore/ExploreShowViewModel.kt
+@@ -11,6 +11,7 @@ import io.legado.app.data.appDb
+ import io.legado.app.data.entities.BookSource
+ import io.legado.app.data.entities.SearchBook
+ import io.legado.app.help.book.isNotShelf
++import io.legado.app.help.book.JinjiangShelfIdentity
+ import io.legado.app.model.webBook.WebBook
+ import io.legado.app.utils.printOnDebug
+ import io.legado.app.utils.stackTraceStr
+@@ -18,12 +19,12 @@ import kotlinx.coroutines.Dispatchers.IO
+ import kotlinx.coroutines.ExperimentalCoroutinesApi
+ import kotlinx.coroutines.flow.catch
+ import kotlinx.coroutines.flow.mapLatest
+-import java.util.concurrent.ConcurrentHashMap
+ 
+ 
+ @OptIn(ExperimentalCoroutinesApi::class)
+ class ExploreShowViewModel(application: Application) : BaseViewModel(application) {
+-    val bookshelf: MutableSet<String> = ConcurrentHashMap.newKeySet()
++    @Volatile
++    private var bookshelf: Set<String> = emptySet()
+     val upAdapterLiveData = MutableLiveData<String>()
+     val booksData = MutableLiveData<List<SearchBook>>()
+     val addBooksData = MutableLiveData<List<SearchBook>>()
+@@ -41,16 +42,13 @@ class ExploreShowViewModel(application: Application) : BaseViewModel(application
+                 val keys = arrayListOf<String>()
+                 books.filterNot { it.isNotShelf }
+                     .forEach {
+-                        keys.add("${it.name}-${it.author}")
+-                        keys.add(it.name)
+-                        keys.add(it.bookUrl)
++                        JinjiangShelfIdentity.addKeys(keys, it.name, it.author, it.bookUrl)
+                     }
+                 keys
+             }.catch {
+                 AppLog.put("发现列表界面获取书籍数据失败\n${it.localizedMessage}", it)
+             }.collect {
+-                bookshelf.clear()
+-                bookshelf.addAll(it)
++                bookshelf = it.toSet()
+                 upAdapterLiveData.postValue("isInBookshelf")
+             }
+         }.onError {
+@@ -117,11 +115,7 @@ class ExploreShowViewModel(application: Application) : BaseViewModel(application
+     }
+ 
+     fun isInBookShelf(book: SearchBook): Boolean {
+-        val name = book.name
+-        val author = book.author
+-        val bookUrl = book.bookUrl
+-        val key = if (author.isNotBlank()) "$name-$author" else name
+-        return bookshelf.contains(key) || bookshelf.contains(bookUrl)
++        return JinjiangShelfIdentity.contains(bookshelf, book.name, book.author, book.bookUrl)
+     }
+ 
+ }
+diff --git a/app/src/main/java/io/legado/app/ui/book/info/BookInfoActivity.kt b/app/src/main/java/io/legado/app/ui/book/info/BookInfoActivity.kt
+index 5a25ace..0457127 100644
+--- a/app/src/main/java/io/legado/app/ui/book/info/BookInfoActivity.kt
++++ b/app/src/main/java/io/legado/app/ui/book/info/BookInfoActivity.kt
+@@ -39,6 +39,7 @@ import io.legado.app.help.AppWebDav
+ import io.legado.app.help.GlideImageGetter
+ import io.legado.app.help.TextViewTagHandler
+ import io.legado.app.help.WebCacheManager
++import io.legado.app.help.book.BookTitleHistory
+ import io.legado.app.help.book.addType
+ import io.legado.app.help.book.getRemoteUrl
+ import io.legado.app.help.book.isAudio
+@@ -540,7 +541,7 @@ class BookInfoActivity :
+     }
+ 
+     private fun showBookIntro(book: Book) {
+-        val intro = book.getDisplayIntro()
++        val intro = BookTitleHistory.displayIntro(book, book.getDisplayIntro())
+         if (intro?.startsWith("<useweb>") == true) {
+             val lastIndex = intro.lastIndexOf("<")
+             if (lastIndex < 8) {
+diff --git a/app/src/main/java/io/legado/app/ui/book/info/BookInfoViewModel.kt b/app/src/main/java/io/legado/app/ui/book/info/BookInfoViewModel.kt
+index 4469da0..c173f21 100644
+--- a/app/src/main/java/io/legado/app/ui/book/info/BookInfoViewModel.kt
++++ b/app/src/main/java/io/legado/app/ui/book/info/BookInfoViewModel.kt
+@@ -21,6 +21,7 @@ import io.legado.app.exception.NoBooksDirException
+ import io.legado.app.exception.NoStackTraceException
+ import io.legado.app.help.AppWebDav
+ import io.legado.app.help.book.BookHelp
++import io.legado.app.help.book.JinjiangShelfIdentity
+ import io.legado.app.help.book.getExportFileName
+ import io.legado.app.help.book.getRemoteUrl
+ import io.legado.app.help.book.isLocal
+@@ -75,6 +76,17 @@ class BookInfoViewModel(application: Application) : BaseViewModel(application) {
+                     upBook(it)
+                     return@execute
+                 }
++                // The discovery URL may differ from the saved source URL after a rename.
++                // Open the existing shelf record so its source, groups and progress survive.
++                JinjiangShelfIdentity.key(bookUrl)?.let { identity ->
++                    appDb.bookDao.all.firstOrNull {
++                        !it.isNotShelf && JinjiangShelfIdentity.key(it.bookUrl) == identity
++                    }?.let { saved ->
++                        inBookshelf = true
++                        upBook(saved)
++                        return@execute
++                    }
++                }
+                 appDb.searchBookDao.getSearchBook(bookUrl)?.toBook()?.let {
+                     upBook(it)
+                     return@execute
+diff --git a/app/src/main/java/io/legado/app/ui/book/search/SearchViewModel.kt b/app/src/main/java/io/legado/app/ui/book/search/SearchViewModel.kt
+index 53b91af..88f8e97 100644
+--- a/app/src/main/java/io/legado/app/ui/book/search/SearchViewModel.kt
++++ b/app/src/main/java/io/legado/app/ui/book/search/SearchViewModel.kt
+@@ -11,6 +11,7 @@ import io.legado.app.data.appDb
+ import io.legado.app.data.entities.SearchBook
+ import io.legado.app.data.entities.SearchKeyword
+ import io.legado.app.help.book.isNotShelf
++import io.legado.app.help.book.JinjiangShelfIdentity
+ import io.legado.app.help.config.AppConfig
+ import io.legado.app.model.webBook.SearchModel
+ import io.legado.app.utils.ConflateLiveData
+@@ -18,12 +19,12 @@ import io.legado.app.utils.toastOnUi
+ import kotlinx.coroutines.ExperimentalCoroutinesApi
+ import kotlinx.coroutines.flow.catch
+ import kotlinx.coroutines.flow.mapLatest
+-import java.util.concurrent.ConcurrentHashMap
+ 
+ @OptIn(ExperimentalCoroutinesApi::class)
+ class SearchViewModel(application: Application) : BaseViewModel(application) {
+     val handler = Handler(Looper.getMainLooper())
+-    val bookshelf: MutableSet<String> = ConcurrentHashMap.newKeySet()
++    @Volatile
++    private var bookshelf: Set<String> = emptySet()
+     val upAdapterLiveData = MutableLiveData<String>()
+     var searchBookLiveData = ConflateLiveData<List<SearchBook>>(1000)
+     val searchScope: SearchScope = SearchScope(AppConfig.searchScope)
+@@ -67,16 +68,13 @@ class SearchViewModel(application: Application) : BaseViewModel(application) {
+                 val keys = arrayListOf<String>()
+                 books.filterNot { it.isNotShelf }
+                     .forEach {
+-                        keys.add("${it.name}-${it.author}")
+-                        keys.add(it.name)
+-                        keys.add(it.bookUrl)
++                        JinjiangShelfIdentity.addKeys(keys, it.name, it.author, it.bookUrl)
+                     }
+                 keys
+             }.catch {
+                 AppLog.put("搜索界面获取书籍列表失败\n${it.localizedMessage}", it)
+             }.collect {
+-                bookshelf.clear()
+-                bookshelf.addAll(it)
++                bookshelf = it.toSet()
+                 upAdapterLiveData.postValue("isInBookshelf")
+             }
+         }.onError {
+@@ -85,11 +83,7 @@ class SearchViewModel(application: Application) : BaseViewModel(application) {
+     }
+ 
+     fun isInBookShelf(book: SearchBook): Boolean {
+-        val name = book.name
+-        val author = book.author
+-        val bookUrl = book.bookUrl
+-        val key = if (author.isNotBlank()) "$name-$author" else name
+-        return bookshelf.contains(key) || bookshelf.contains(bookUrl)
++        return JinjiangShelfIdentity.contains(bookshelf, book.name, book.author, book.bookUrl)
+     }
+ 
+     /**
+diff --git a/app/src/test/java/io/legado/app/help/book/JinjiangShelfIdentityTest.java b/app/src/test/java/io/legado/app/help/book/JinjiangShelfIdentityTest.java
+new file mode 100644
+index 0000000..ebe5b29
+--- /dev/null
++++ b/app/src/test/java/io/legado/app/help/book/JinjiangShelfIdentityTest.java
+@@ -0,0 +1,55 @@
++package io.legado.app.help.book;
++
++import org.junit.Test;
++import static org.junit.Assert.*;
++
++public class JinjiangShelfIdentityTest {
++    @Test public void actualIndicatorMatchesRenamedWorkButNotNewWorkAndClearsAfterRemoval() {
++        java.util.Set<String> shelf = new java.util.HashSet<>();
++        JinjiangShelfIdentity.addKeys(shelf, "old title", "author", "http://app-cdn.jjwxc.net/androidapi/novelbasicinfo?novelId=6057684");
++        assertTrue(JinjiangShelfIdentity.contains(shelf, "new title", "author", "https://www.jjwxc.net/onebook.php?novelid=6057684"));
++        assertFalse(JinjiangShelfIdentity.contains(shelf, "new work", "author", "https://www.jjwxc.net/onebook.php?novelid=999"));
++        shelf.clear();
++        assertFalse(JinjiangShelfIdentity.contains(shelf, "new title", "author", "https://www.jjwxc.net/onebook.php?novelid=6057684"));
++    }
++    @Test public void existingNameAuthorAndExactUrlBehaviorIsPreservedForOtherSites() {
++        java.util.Set<String> shelf = new java.util.HashSet<>();
++        JinjiangShelfIdentity.addKeys(shelf, "title", "author", "https://www.gongzicp.com/novel-12.html");
++        assertTrue(JinjiangShelfIdentity.contains(shelf, "title", "author", "https://example.org/book"));
++        assertTrue(JinjiangShelfIdentity.contains(shelf, "changed", "author", "https://www.gongzicp.com/novel-12.html"));
++        assertFalse(JinjiangShelfIdentity.contains(shelf, "changed", "author", "https://www.gongzicp.com/novel-13.html"));
++        assertFalse(JinjiangShelfIdentity.contains(shelf, "title", "other author", "https://example.org/book"));
++        assertTrue(JinjiangShelfIdentity.contains(shelf, "title", "", "https://example.org/book"));
++    }
++    private String key(String url) { return JinjiangShelfIdentity.key(url); }
++
++    @Test public void renamedBookKeepsIdentityAcrossApiAndWebUrls() {
++        String shelf = key("http://app-cdn.jjwxc.net/androidapi/novelbasicinfo?novelId=6057684");
++        assertNotNull(shelf);
++        assertEquals(shelf, key("https://www.jjwxc.net/onebook.php?novelid=6057684"));
++        assertEquals(shelf, key("https://app.jjwxc.org/androidapi/novelbasicinfo?novelId=6057684&versionCode=513"));
++    }
++    @Test public void queryOrderCaseEncodingAndRequestOptionsDoNotChangeIdentity() {
++        String expected = key("https://app-cdn.jjwxc.net/androidapi/novelbasicinfo?novelId=6057684");
++        assertEquals(expected, key("https://WWW.JJWXC.NET/onebook.php?other=x&NOVELID=6057684#toc"));
++        assertEquals(expected, key("https://www.jjwxc.net/onebook.php?novel%69d=%36%30%35%37%36%38%34"));
++        assertEquals(expected, key("https://www.jjwxc.net/onebook.php?novelid=6057684, {\"headers\":{\"Referer\":\"https://example.org\"}}"));
++        assertEquals(expected, key("https://www.jjwxc.net/onebook.php?novelid=06057684"));
++    }
++    @Test public void existingJinjiangBridgeUrlsMatchTheSameWork() {
++        String expected = key("https://www.jjwxc.net/onebook.php?novelid=6057684");
++        assertEquals(expected, key("https://sangtacviet.app/truyen/jjwxc/1/6057684/"));
++        assertEquals(expected, key("http://sangtacviet.com/truyen/jjwxc/1/6057684/"));
++    }
++    @Test public void differentWorksNeverMatchEvenWithSimilarTitles() {
++        assertNotEquals(key("https://www.jjwxc.net/onebook.php?novelid=1"), key("https://www.jjwxc.net/onebook.php?novelid=2"));
++    }
++    @Test public void untrustedDomainsAndUnrelatedPathsDoNotProduceIdentity() {
++        String[] urls = {"https://eviljjwxc.net/onebook.php?novelid=1", "https://jjwxc.net.evil.org/onebook.php?novelid=1", "https://jjwxc.net@evil.org/onebook.php?novelid=1", "https://www.jjwxc.net/author.php?novelid=1", "https://www.jjwxc.net/onebook.php?next=https://evil.org/?novelid=1", "https://www.gongzicp.com/novel-1.html", "https://evil.org/onebook.php?novelid=1", "https://sangtacviet.app/truyen/qidian/1/6057684/"};
++        for (String url : urls) assertNull(url, key(url));
++    }
++    @Test public void missingMalformedAndConflictingIdsAreRejected() {
++        String[] urls = {null,"", "not a url", "https://www.jjwxc.net/onebook.php", "https://www.jjwxc.net/onebook.php?novelid=", "https://www.jjwxc.net/onebook.php?novelid=0", "https://www.jjwxc.net/onebook.php?novelid=-1", "https://www.jjwxc.net/onebook.php?novelid=1abc", "https://www.jjwxc.net/onebook.php?novelid=1&novelId=2", "https://www.jjwxc.net/onebook.php?novelid=%zz", "file://www.jjwxc.net/onebook.php?novelid=1"};
++        for (String url : urls) assertNull(url, key(url));
++    }
++}
+diff --git a/app/src/test/java/io/legado/app/help/book/JinjiangTitleHistoryTest.java b/app/src/test/java/io/legado/app/help/book/JinjiangTitleHistoryTest.java
+new file mode 100644
+index 0000000..739d905
+--- /dev/null
++++ b/app/src/test/java/io/legado/app/help/book/JinjiangTitleHistoryTest.java
+@@ -0,0 +1,40 @@
++package io.legado.app.help.book;
++
++import org.junit.Test;
++import java.util.*;
++import static org.junit.Assert.*;
++
++public class JinjiangTitleHistoryTest {
++    @Test public void firstRenameKeepsTheShelfTitle() {
++        List<String> seen=JinjiangTitleHistory.observe(Collections.emptyList(), "旧书名", "新书名");
++        assertEquals("曾用名：旧书名\n\n最新文案", JinjiangTitleHistory.decorate(seen,"新书名","最新文案"));
++    }
++    @Test public void successiveRefreshesDeduplicateAndUseFreshIntro() {
++        List<String> seen=JinjiangTitleHistory.observe(Collections.emptyList(),"甲","乙");
++        seen=JinjiangTitleHistory.observe(seen,"甲","丙");
++        seen=JinjiangTitleHistory.observe(seen,"甲","丙");
++        assertEquals("曾用名：甲／乙\n\n更新后的文案",JinjiangTitleHistory.decorate(seen,"丙","更新后的文案"));
++    }
++    @Test public void returningToAnOldTitleDoesNotListTheCurrentTitleAsFormer() {
++        List<String> seen=JinjiangTitleHistory.observe(Arrays.asList("甲","乙","丙"),"甲","乙");
++        assertEquals("曾用名：甲／丙\n\n文案",JinjiangTitleHistory.decorate(seen,"乙","文案"));
++    }
++    @Test public void unchangedOrEmptyTitlesDoNotInventHistory() {
++        List<String> seen=JinjiangTitleHistory.observe(Collections.emptyList(),"甲","甲");
++        assertEquals("文案",JinjiangTitleHistory.decorate(seen,"甲","文案"));
++        assertEquals(seen,JinjiangTitleHistory.observe(seen,"甲"," "));
++        assertEquals("文案",JinjiangTitleHistory.decorate(Collections.emptyList(),"甲","文案"));
++    }
++    @Test public void richIntroMarkersAndMarkupEscapingArePreserved() {
++        assertEquals("<md>曾用名：甲\\*\\[旧\\]\n\n正文",JinjiangTitleHistory.decorate(Arrays.asList("甲*[旧]","乙"),"乙","<md>正文"));
++        String html=JinjiangTitleHistory.decorate(Arrays.asList("<旧&名>","新"),"新","<usehtml><b>正文</b>");
++        assertEquals("<usehtml><p>曾用名：&lt;旧&amp;名&gt;</p><b>正文</b>",html);
++        assertEquals("<useweb><p>曾用名：旧</p><div>正文</div>",JinjiangTitleHistory.decorate(Arrays.asList("旧","新"),"新","<useweb><div>正文</div>"));
++    }
++    @Test public void decorationNeverMutatesStoredTitlesOrIntro() {
++        List<String> seen=Collections.unmodifiableList(Arrays.asList("旧","新"));
++        assertEquals("曾用名：旧\n\n正文",JinjiangTitleHistory.decorate(seen,"新","正文"));
++        assertEquals(Arrays.asList("旧","新"),seen);
++        assertEquals("曾用名：旧\n\n正文",JinjiangTitleHistory.decorate(seen,"新","正文"));
++    }
++}
+diff --git a/docs/local-fixes/build-test.ps1 b/docs/local-fixes/build-test.ps1
+new file mode 100644
+index 0000000..5ff2731
+--- /dev/null
++++ b/docs/local-fixes/build-test.ps1
+@@ -0,0 +1,13 @@
++param([string]$JdkHome, [string]$SdkHome, [string]$RepositoryInit)
++$ErrorActionPreference='Stop'
++Set-Location (Resolve-Path (Join-Path $PSScriptRoot '../..'))
++if($JdkHome){ $env:JAVA_HOME=$JdkHome; $env:Path=(Join-Path $JdkHome 'bin')+';'+$env:Path }
++if($SdkHome){ $env:ANDROID_HOME=$SdkHome; $env:ANDROID_SDK_ROOT=$SdkHome }
++$env:GRADLE_USER_HOME=Join-Path (Get-Location) '.local-build/gradle'
++$env:ANDROID_USER_HOME=Join-Path (Get-Location) '.local-build/android-user'
++New-Item -ItemType Directory -Force $env:ANDROID_USER_HOME | Out-Null
++$gradleArgs=@(':app:testAppDebugUnitTest','--tests','io.legado.app.help.book.Jinjiang*Test',':app:assembleAppDebug','-PjjIdentityTest=true','--no-daemon','--max-workers=2')
++if($RepositoryInit){$gradleArgs+=@('--init-script',(Resolve-Path -LiteralPath $RepositoryInit).Path)}
++& ./gradlew.bat @gradleArgs
++if($LASTEXITCODE -ne 0){throw '构建未通过，不能发布或安装APK。'}
++Get-ChildItem app/build/outputs/apk/app/debug/*.apk | Select-Object FullName,Length
+diff --git a/docs/local-fixes/jj-shelf-identity.md b/docs/local-fixes/jj-shelf-identity.md
+new file mode 100644
+index 0000000..2655fb8
+--- /dev/null
++++ b/docs/local-fixes/jj-shelf-identity.md
+@@ -0,0 +1,9 @@
++# 晋江改名识别修复
++
++基线：lyc486/legado main 8b87c5aba4df91c39a3a0939a68a1180b9f2ee1c。
++
++范围：发现页、搜索页的书架绿点。基线已有书名作者及完整URL匹配；新增可信晋江链接中的固定novelId匹配，兼容网页/接口及HTTP/HTTPS，不修改书名、URL、数据库结构或分组进度。不扩展到其他站点或任意URL中的数字。
++
++实现：共享纯JVM身份解析器，限定jjwxc.net/jjwxc.org及子域、onebook.php与novelbasicinfo路径；支持已存在书架的sangtacviet晋江桥接路径；严格参数验证，拒绝冲突ID、嵌套外站URL、非晋江数字。快照更新采用不可变索引原子替换，避免清空再填充期间短暂漏标。非书架记录继续排除。
++
++验证：先编写改名、协议、网页/API、大小写参数、URL请求选项、无ID/不同ID/恶意域名及旧逻辑回归测试；再接入两个ViewModel。独立包名测试构建，原手机数据不写入，备份导入由用户选择。手机实测未完成前不称完全修复。
+diff --git a/docs/local-fixes/title-history.md b/docs/local-fixes/title-history.md
+new file mode 100644
+index 0000000..9db7aa8
+--- /dev/null
++++ b/docs/local-fixes/title-history.md
+@@ -0,0 +1,13 @@
++# 曾用名与文案自动校准（2026-11-19）
++
++用户选择：只显示书籍详情，不显示在发现/搜索列表。
++
++表现：详情简介顶部为“曾用名：历史书名1／历史书名2”，空一行后展示当前官网文案；如有手写简介，继续展示手写内容，不覆盖。按首次记录顺序去重，排除本次官网当前书名；改回旧名也正确排除当前名，仍保留完整已观察历史。
++
++数据：使用现有Book.variable保存按固定晋江作品ID绑定的历史，不新增数据库表/列，跟随现有书架备份恢复。首次从书架已有旧名开始记录，不能恢复过去从未观察或保存的改名。详情来自发现的新Book实例时，按作品ID合并书架保存的历史。
++
++更新：书籍详情信息获取成功时记录观察到的书名；晋江目录刷新且非刚从详情刷新进入时，额外刷新一份书籍信息副本，只合并源简介及历史，保留书架名、分组、进度和手写简介。信息查询失败时保留旧文案和历史，不中断原章节刷新；取消信号继续传播。增加每本晋江书一次详情请求。
++
++显示：仅在BookInfoActivity.showBookIntro渲染时添加前缀，原始intro和customIntro不写入前缀，编辑页、导出与发现列表不受装饰影响；兼容HTML/Markdown标记。
++
++验证：Java实现的6项新测试覆盖多次改名、去重、改回旧名、文案替换、无变化、空响应、格式与不变性，连同原绿点8项测试共14项通过。Android/Kotlin完整编译、14项Android项目测试、APK打包及签名检查已完成；手机实际安装与界面实测尚未执行。
+diff --git a/docs/local-fixes/verification.md b/docs/local-fixes/verification.md
+new file mode 100644
+index 0000000..92b219e
+--- /dev/null
++++ b/docs/local-fixes/verification.md
+@@ -0,0 +1,17 @@
++# 构建和验证记录（2026-11-19）
++
++基线：Gitee lyc486/legado main，8b87c5aba4df91c39a3a0939a68a1180b9f2ee1c。
++
++结果：完整 Android 构建已成功，testAppDebugUnitTest 与 assembleAppDebug 均通过。14项相关测试，0失败、0错误、0跳过。
++
++APK：Sigma-改名识别测试-20261119.apk；版本3.26.111901-jjid-test；包名io.legado.app.jjidentitytest；名称Sigma 改名识别测试；minSdk21/targetSdk36，包含arm64-v8a、armeabi-v7a、x86、x86_64。v1/v2签名验证通过。独立包名及全部provider authority、应用自定义权限均已检查，不与原Sigma共用。
++
++功能：发现/搜索绿点按固定晋江novelId识别；点击不同链接形式的同作品时复用已有书架记录，保留原书源、分组与进度。详情页前置曾用名，按观察顺序去重并排除当前官网名；刷新时同步官网文案，保留手写简介，失败时保留旧内容。历史保存在现有Book.variable字段，正常备份可携带，不增加数据库表或列。过去未记录到的名字无法凭空恢复。
++
++验证范围：完整Kotlin/Java源码编译、Android资源与打包、14项JVM测试、签名与APK安装元信息。另已在前次检查中验证3795条真实备份URL身份等价。独立代码审查通过。git diff --check通过。
++
++未验证：手机实际安装运行、书源实际响应、备份恢复及界面表现。未自动安装到手机，未操作手机书架，未改两张电脑追更表，未创建远程fork或发布。
++
++构建：JDK17、Gradle8.14.4、Android SDK36/BuildTools35；首次完整构建10分15秒。项目推荐Maven镜像仅通过本地init脚本使用，不修改正式settings.gradle。必要工具均在F盘项目内，已删除主要重复下载归档；保留构建缓存和独立测试签名供后续更新。
++
++后续重现：docs/local-fixes/build-test.ps1可传JdkHome、SdkHome和可选RepositoryInit。独立测试参数-PjjIdentityTest=true，默认构建包名不变。

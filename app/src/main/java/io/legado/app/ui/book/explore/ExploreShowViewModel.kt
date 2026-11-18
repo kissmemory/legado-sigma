@@ -11,6 +11,7 @@ import io.legado.app.data.appDb
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.help.book.isNotShelf
+import io.legado.app.help.book.JinjiangShelfIdentity
 import io.legado.app.model.webBook.WebBook
 import io.legado.app.utils.printOnDebug
 import io.legado.app.utils.stackTraceStr
@@ -18,12 +19,12 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapLatest
-import java.util.concurrent.ConcurrentHashMap
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExploreShowViewModel(application: Application) : BaseViewModel(application) {
-    val bookshelf: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    @Volatile
+    private var bookshelf: Set<String> = emptySet()
     val upAdapterLiveData = MutableLiveData<String>()
     val booksData = MutableLiveData<List<SearchBook>>()
     val addBooksData = MutableLiveData<List<SearchBook>>()
@@ -41,16 +42,13 @@ class ExploreShowViewModel(application: Application) : BaseViewModel(application
                 val keys = arrayListOf<String>()
                 books.filterNot { it.isNotShelf }
                     .forEach {
-                        keys.add("${it.name}-${it.author}")
-                        keys.add(it.name)
-                        keys.add(it.bookUrl)
+                        JinjiangShelfIdentity.addKeys(keys, it.name, it.author, it.bookUrl)
                     }
                 keys
             }.catch {
                 AppLog.put("发现列表界面获取书籍数据失败\n${it.localizedMessage}", it)
             }.collect {
-                bookshelf.clear()
-                bookshelf.addAll(it)
+                bookshelf = it.toSet()
                 upAdapterLiveData.postValue("isInBookshelf")
             }
         }.onError {
@@ -117,11 +115,7 @@ class ExploreShowViewModel(application: Application) : BaseViewModel(application
     }
 
     fun isInBookShelf(book: SearchBook): Boolean {
-        val name = book.name
-        val author = book.author
-        val bookUrl = book.bookUrl
-        val key = if (author.isNotBlank()) "$name-$author" else name
-        return bookshelf.contains(key) || bookshelf.contains(bookUrl)
+        return JinjiangShelfIdentity.contains(bookshelf, book.name, book.author, book.bookUrl)
     }
 
 }

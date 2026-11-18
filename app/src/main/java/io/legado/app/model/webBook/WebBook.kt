@@ -7,6 +7,8 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.BookSourcePart
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.exception.NoStackTraceException
+import io.legado.app.help.book.BookTitleHistory
+import io.legado.app.help.book.JinjiangShelfIdentity
 import io.legado.app.help.book.addType
 import io.legado.app.help.book.removeAllBookType
 import io.legado.app.help.coroutine.Coroutine
@@ -290,6 +292,19 @@ object WebBook {
         book.removeAllBookType()
         book.addType(bookSource.getBookType())
         return kotlin.runCatching {
+            // Chapter refresh also checks the current public intro/title. Keep errors isolated
+            // and retain the shelf name, progress, groups and handwritten intro.
+            if (!isFromBookInfo && JinjiangShelfIdentity.key(book.bookUrl) != null) {
+                try {
+                    val refreshed = book.copy().apply { infoHtml = null }
+                    getBookInfoAwait(bookSource, refreshed, canReName = false)
+                    book.intro = refreshed.intro
+                    BookTitleHistory.copyFrom(refreshed, book)
+                } catch (error: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    AppLog.put("同步晋江文案失败，保留原文案：${error.localizedMessage}")
+                }
+            }
             if (runPerJs) {
                 runPreUpdateJs(bookSource, book, isFromBookInfo).getOrThrow()
             }
