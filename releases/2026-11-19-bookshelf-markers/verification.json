@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-19",
+  "package": "io.legado.app.jjidentitytest",
+  "label": "书库S",
+  "version": "3.26.111904-jjid-test",
+  "apk": "ShuKuS-bookshelf-markers-20261119.apk",
+  "apk_bytes": 38770345,
+  "apk_sha256": "35f2775ed74db19a709d11ffb02172a8f7b953aaf4f65a369479f6abd1cb9817",
+  "apk_git_blob": "d89c0f136caa858e58a00188e13451e6d71f7175",
+  "source_archive": "ShuKuS-bookshelf-source-20261119.zip",
+  "source_bytes": 6800144,
+  "source_sha256": "a59a99e139c596f1af87351a988cdd2dfc8966e070359f4b7e00c5b2985bb3eb",
+  "source_git_blob": "0eec89c2e6798df66768ac956bb3987c9af6d6ff",
+  "certificate_sha256": "8c60657ba4986733fedcc51c157ed989bcf85d7a585713364239dc8ceff14031",
+  "same_signature_as_previous_test": true,
+  "embedded_changelog_matches_source": true,
+  "purchase_marker_scope": "all sources, TOC and bookshelf latest chapter",
+  "refresh_directory_after_update": true,
+  "tests": [
+    {
+      "name": "io.legado.app.help.book.ChapterPurchaseMarkerTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangShelfIdentityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangTitleHistoryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "phone_tested": false,
+  "previous_commit": "be54b082673319a6bdf4d0f9ce5f8f5c2947444b"
+}

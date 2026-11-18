@@ -11,6 +11,7 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.rule.TocRule
 import io.legado.app.exception.NoStackTraceException
 import io.legado.app.exception.TocEmptyException
+import io.legado.app.help.book.ChapterPurchaseMarker
 import io.legado.app.help.book.ContentProcessor
 import io.legado.app.help.book.simulatedTotalChapterNum
 import io.legado.app.help.config.AppConfig
@@ -169,13 +170,17 @@ object BookChapterList {
         }
         book.lastCheckTime = System.currentTimeMillis()
         book.totalChapterNum = list.size
-        book.latestChapterTitle =
-            list.getOrElse(book.simulatedTotalChapterNum() - 1) { list.last() }
-                .getDisplayTitle(
-                    replaceRules,
-                    book.getUseReplaceRule(),
-                    replaceBook = replaceBook
-                )
+        val latestChapter = list.getOrElse(book.simulatedTotalChapterNum() - 1) { list.last() }
+        book.latestChapterTitle = ChapterPurchaseMarker.title(
+            latestChapter.getDisplayTitle(
+                replaceRules,
+                book.getUseReplaceRule(),
+                replaceBook = replaceBook
+            ),
+            latestChapter.isVip,
+            latestChapter.isPay,
+            latestChapter.isVolume
+        )
         currentCoroutineContext().ensureActive()
         upChapterInfo(list, book)
         return list

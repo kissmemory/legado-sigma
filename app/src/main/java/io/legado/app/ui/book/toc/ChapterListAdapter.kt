@@ -11,6 +11,7 @@ import io.legado.app.base.adapter.ItemViewHolder
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.databinding.ItemChapterListBinding
+import io.legado.app.help.book.ChapterPurchaseMarker
 import io.legado.app.help.book.ContentProcessor
 import io.legado.app.help.config.AppConfig
 import io.legado.app.help.coroutine.Coroutine
@@ -126,8 +127,9 @@ class ChapterListAdapter(context: Context, val callback: Callback) :
         binding.run {
             // Some sources mark free chapters as isPay=true. Only paid/VIP chapter
             // rows have a purchase marker; cache/read status stays independent.
-            val showPurchase = item.isVip && !item.isVolume
-            ivLocked.text = if (item.isPay) "🐣" else "🥚"
+            val marker = ChapterPurchaseMarker.marker(item.isVip, item.isPay, item.isVolume)
+            val showPurchase = marker.isNotEmpty()
+            ivLocked.text = marker
             ivLocked.contentDescription = if (showPurchase) {
                 context.getString(if (item.isPay) R.string.chapter_purchased else R.string.chapter_not_purchased)
             } else null

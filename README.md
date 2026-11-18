@@ -1,10 +1,15 @@
-> **当前定制版：书库S · 3.26.111903-jjid-test**  
-> 全书源通用购买标识：未购买🥚、已购买🐣；保留晋江固定ID识别与详情曾用名功能。  
-> [下载书库S APK](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/2026-11-19-shukus/ShuKuS-20261119.apk) · [更新日志](app/src/main/assets/updateLog.md) · [验证记录](releases/2026-11-19-shukus/verification.json)
->
-> 包名及签名与上一测试版相同，可覆盖更新。完整构建、14项既有回归、签名和内置日志已核验，手机实际Emoji显示和购买状态仍待实测。
->
-> [原始基准提交](https://github.com/kissmemory/legado-sigma/commit/3ac8dfbca9b41aa7e9d36a976703c805a2f8d62e)保留；本分支持续维护后续增量，每次代码修改同提交更新日志。源码依据Gitee `lyc486/legado@8b87c5aba4df91c39a3a0939a68a1180b9f2ee1c`。手机备份、登录数据、编译缓存和本次测试签名私钥不上传。
+# 书库S 自定义版本
+
+当前版本：**3.26.111904-jjid-test**。
+
+- 修复所有书源的书架最新章节购买标识：未购买 🥚，已购买 🐣；目录标识继续保留。
+- 覆盖安装上一测试版后，正常刷新一次书架或目录即可，无需重新导入数据。
+- 保留晋江作品身份识别、详情曾用名和原有分组、阅读进度。
+- 已通过 19 项回归测试及同签名验证；手机实际显示待实测。
+
+[下载安装包](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/2026-11-19-bookshelf-markers/ShuKuS-bookshelf-markers-20261119.apk) · [修改日志](app/src/main/assets/updateLog.md) · [验证记录](releases/2026-11-19-bookshelf-markers/verification.json)
+
+以下保留上游项目说明。
 
 <div align="center">
 <img width="125" height="125" src="https://gitee.com/lyc486/legado/raw/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="legado"/>
