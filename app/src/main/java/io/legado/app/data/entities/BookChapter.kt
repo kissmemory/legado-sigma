@@ -121,6 +121,17 @@ data class BookChapter(
         return bookUrl + url
     }
 
+    /** Purchase status for shelf/detail progress summaries only; raw reading titles stay unchanged. */
+    fun getProgressTitle(
+        replaceRules: List<ReplaceRule>? = null,
+        useReplace: Boolean = true,
+        chineseConvert: Boolean = true,
+        replaceBook: ReplaceBook? = null
+    ): String = io.legado.app.help.book.ChapterPurchaseMarker.title(
+        getDisplayTitle(replaceRules, useReplace, chineseConvert, replaceBook),
+        isVip, isPay, isVolume
+    )
+
     fun getDisplayTitle(
         replaceRules: List<ReplaceRule>? = null,
         useReplace: Boolean = true,

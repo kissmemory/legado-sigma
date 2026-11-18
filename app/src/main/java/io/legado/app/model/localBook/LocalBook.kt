@@ -152,7 +152,7 @@ object LocalBook {
         val replaceRules = ContentProcessor.get(book).getTitleReplaceRules()
         val replaceBook = book.toReplaceBook()
         book.durChapterTitle = list.getOrElse(book.durChapterIndex) { list.last() }
-            .getDisplayTitle(
+            .getProgressTitle(
                 replaceRules,
                 book.getUseReplaceRule(),
                 replaceBook = replaceBook

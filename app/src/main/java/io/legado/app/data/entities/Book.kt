@@ -399,7 +399,7 @@ data class Book(
         if (toc.isNotEmpty()) {
             newBook.durChapterIndex = BookHelp
                 .getDurChapter(durChapterIndex, durChapterTitle, toc, totalChapterNum)
-            newBook.durChapterTitle = toc[newBook.durChapterIndex].getDisplayTitle(
+            newBook.durChapterTitle = toc[newBook.durChapterIndex].getProgressTitle(
                 ContentProcessor.get(newBook.name, newBook.origin).getTitleReplaceRules(),
                 getUseReplaceRule(),
                 replaceBook = toReplaceBook()

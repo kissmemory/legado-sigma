@@ -417,7 +417,7 @@ object AudioPlay : CoroutineScope by MainScope() {
             book.durChapterPos = durChapterPos
             if (first || chapterChanged) {
                 appDb.bookChapterDao.getChapter(book.bookUrl, book.durChapterIndex)?.let {
-                    book.durChapterTitle = it.getDisplayTitle(
+                    book.durChapterTitle = it.getProgressTitle(
                         ContentProcessor.get(book.name, book.origin).getTitleReplaceRules(),
                         book.getUseReplaceRule(),
                         replaceBook = book.toReplaceBook()

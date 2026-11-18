@@ -336,7 +336,7 @@ object ReadManga : CoroutineScope by MainScope() {
                 book.durChapterPos = durChapterPos
                 if (!pageChanged || chapterChanged) {
                     appDb.bookChapterDao.getChapter(book.bookUrl, durChapterIndex)?.let {
-                        book.durChapterTitle = it.getDisplayTitle(
+                        book.durChapterTitle = it.getProgressTitle(
                             ContentProcessor.get(book.name, book.origin).getTitleReplaceRules(),
                             book.getUseReplaceRule(),
                             replaceBook = book.toReplaceBook()

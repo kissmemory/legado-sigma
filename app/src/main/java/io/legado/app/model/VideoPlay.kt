@@ -510,7 +510,9 @@ object VideoPlay : CoroutineScope by MainScope(){
                 book.durChapterPos = durPos
                 val chapter = toc?.getOrNull(durChapterIndex)
                 videoTitle = chapter?.title
-                book.durChapterTitle = chapter?.title
+                book.durChapterTitle = chapter?.let {
+                    io.legado.app.help.book.ChapterPurchaseMarker.title(it.title, it.isVip, it.isPay, it.isVolume)
+                }
                 SourceCallBack.callBackBook(SourceCallBack.SAVE_READ, source as BookSource?, book, chapter, durTime.toString())
                 book.update()
             }

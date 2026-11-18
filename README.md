@@ -1,13 +1,10 @@
 # 书库S 自定义版本
 
-当前版本：**3.26.111904-jjid-test**。
+最新修复：补齐书架当前阅读章、详情页目录位置的 🥚／🐣 标识，同时覆盖刷新、翻页保存、音频/漫画/视频及换源恢复入口。
 
-- 修复所有书源的书架最新章节购买标识：未购买 🥚，已购买 🐣；目录标识继续保留。
-- 覆盖安装上一测试版后，正常刷新一次书架或目录即可，无需重新导入数据。
-- 保留晋江作品身份识别、详情曾用名和原有分组、阅读进度。
-- 已通过 19 项回归测试及同签名验证；手机实际显示待实测。
+[下载最新安装包](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/2026-11-19-current-chapter/ShuKuS-current-chapter-20261119.apk) · [修改日志](app/src/main/assets/updateLog.md) · [验证记录](releases/2026-11-19-current-chapter/verification.json)
 
-[下载安装包](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/2026-11-19-bookshelf-markers/ShuKuS-bookshelf-markers-20261119.apk) · [修改日志](app/src/main/assets/updateLog.md) · [验证记录](releases/2026-11-19-bookshelf-markers/verification.json)
+可覆盖上一书库S测试版；安装后刷新一次目录。原始章节标题、索引、分组和阅读位置不变。21 项回归检查通过，手机显示待实测。
 
 以下保留上游项目说明。
 
