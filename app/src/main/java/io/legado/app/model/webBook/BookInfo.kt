@@ -113,7 +113,7 @@ object BookInfo {
         Debug.log(bookSource.bookSourceUrl, "┌获取最新章节")
         try {
             analyzeRule.getString(infoRule.lastChapter).let {
-                if (it.isNotEmpty()) book.latestChapterTitle = it
+                if (it.isNotEmpty()) book.latestChapterTitle = io.legado.app.help.book.ChapterPurchaseMarker.mergeLatestTitle(it, book.latestChapterTitle)
                 Debug.log(bookSource.bookSourceUrl, "└${it}")
             }
         } catch (e: Exception) {

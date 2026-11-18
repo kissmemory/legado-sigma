@@ -5,6 +5,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CurrentChapterMarkerTest {
+    @Test fun readingMenuSummaryDoesNotDecorateTheBodyTitle() {
+        val raw = BookChapter(title = "第9章", isVip = true, isPay = true)
+        val text = io.legado.app.ui.book.read.page.entities.TextChapter(raw, 8, raw.title, 10, false, true, true, null)
+        assertEquals("🐣 第9章", text.getStatusTitle())
+        assertEquals("第9章", text.title)
+        assertEquals("第9章", raw.title)
+    }
+
     @Test fun currentChapterReflectsPurchaseChangesWithoutChangingRawTitleOrIndex() {
         val chapter = BookChapter(title = "第170章 当前章", index = 169, isVip = true)
         assertEquals("🥚 第170章 当前章", chapter.getProgressTitle(chineseConvert = false))

@@ -387,3 +387,11 @@ fun tryParesExportFileName(jsStr: String): Boolean {
         true
     }.getOrDefault(false)
 }
+/** Restore a progress summary using this device's chapter flags, not another device's title prefix. */
+fun Book.restoreProgressTitle(fallback: String?) {
+    durChapterTitle = appDb.bookChapterDao.getChapter(bookUrl, durChapterIndex)?.getProgressTitle(
+        ContentProcessor.get(this).getTitleReplaceRules(),
+        getUseReplaceRule(),
+        replaceBook = toReplaceBook()
+    ) ?: ChapterPurchaseMarker.normalizeLegacyTitle(fallback)
+}

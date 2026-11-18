@@ -30,6 +30,10 @@ data class TextChapter(
     val effectiveReplaceRules: List<ReplaceRule>?
 ) : LayoutProgressListener {
 
+    fun getStatusTitle(): String = io.legado.app.help.book.ChapterPurchaseMarker.title(
+        title, isVip, isPay, chapter.isVolume
+    )
+
     private val textPages = arrayListOf<TextPage>()
     val pages: List<TextPage> get() = textPages
 

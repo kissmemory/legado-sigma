@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import io.legado.app.api.ReturnData
+import io.legado.app.help.book.restoreProgressTitle
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookProgress
@@ -258,7 +259,7 @@ object BookController {
                 appDb.bookDao.getBook(bookProgress.name, bookProgress.author)?.let { book ->
                     book.durChapterIndex = bookProgress.durChapterIndex
                     book.durChapterPos = bookProgress.durChapterPos
-                    book.durChapterTitle = bookProgress.durChapterTitle
+                    book.restoreProgressTitle(bookProgress.durChapterTitle)
                     book.durChapterTime = bookProgress.durChapterTime
                     AppWebDav.uploadBookProgress(bookProgress) {
                         book.syncTime = System.currentTimeMillis()

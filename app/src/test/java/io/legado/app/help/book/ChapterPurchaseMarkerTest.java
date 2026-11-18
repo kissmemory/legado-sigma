@@ -4,6 +4,18 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ChapterPurchaseMarkerTest {
+    @Test public void legacyTitlesNormalizeOnlyExplicitStatus() {
+        assertEquals("🥚 第9章", ChapterPurchaseMarker.normalizeLegacyTitle("🔒第9章"));
+        assertEquals("🐣 第9章", ChapterPurchaseMarker.normalizeLegacyTitle("🔓第9章"));
+        assertEquals("普通标题", ChapterPurchaseMarker.normalizeLegacyTitle("普通标题"));
+        assertNull(ChapterPurchaseMarker.normalizeLegacyTitle(null));
+    }
+    @Test public void infoRefreshKeepsStatusOnlyForTheSameChapter() {
+        assertEquals("🐣 第9章", ChapterPurchaseMarker.mergeLatestTitle("第9章", "🐣 第9章"));
+        assertEquals("第10章", ChapterPurchaseMarker.mergeLatestTitle("第10章", "🐣 第9章"));
+        assertEquals("🥚 第9章", ChapterPurchaseMarker.mergeLatestTitle("🔒第9章", "🐣 第9章"));
+    }
+
     @Test public void bookshelfLatestChapterUsesTheSameUnpaidAndPurchasedMarkers() {
         assertEquals("🥚 第54章 遗孀", ChapterPurchaseMarker.title("第54章 遗孀",true,false,false));
         assertEquals("🐣 第54章 遗孀", ChapterPurchaseMarker.title("第54章 遗孀",true,true,false));

@@ -4,6 +4,7 @@ import android.net.Uri
 import io.legado.app.R
 import io.legado.app.constant.AppLog
 import io.legado.app.constant.PreferKey
+import io.legado.app.help.book.restoreProgressTitle
 import io.legado.app.data.appDb
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookProgress
@@ -325,7 +326,7 @@ object AppWebDav {
                 ) {
                     book.durChapterIndex = bookProgress.durChapterIndex
                     book.durChapterPos = bookProgress.durChapterPos
-                    book.durChapterTitle = bookProgress.durChapterTitle
+                    book.restoreProgressTitle(bookProgress.durChapterTitle)
                     book.durChapterTime = bookProgress.durChapterTime
                     book.syncTime = System.currentTimeMillis()
                     appDb.bookDao.update(book)

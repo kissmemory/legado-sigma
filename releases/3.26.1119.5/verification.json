@@ -1,0 +1,40 @@
+{
+  "version": "3.26.1119.5-jjid-test",
+  "versionCode": 10005,
+  "apk_bytes": 38771797,
+  "apk_git_blob": "63915e8cc998da023ece4c5a645cecbd4d0f0959",
+  "apk_sha256": "a262c9e922e3d93c27499c027eacba700246ca4e052f4f9219522a38f98bc12e",
+  "tests": [
+    {
+      "name": "io.legado.app.help.book.ChapterPurchaseMarkerTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.CurrentChapterMarkerTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangShelfIdentityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangTitleHistoryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0"
+    }
+  ],
+  "phone_tested": false,
+  "embedded_changelog_matches_source": true,
+  "package": "io.legado.app.jjidentitytest",
+  "label": "书库S",
+  "certificate_sha256": "8c60657ba4986733fedcc51c157ed989bcf85d7a585713364239dc8ceff14031",
+  "same_signature_as_previous_test": true,
+  "version_increment_script_checked_twice": true
+}

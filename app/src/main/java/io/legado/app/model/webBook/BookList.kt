@@ -248,7 +248,7 @@ object BookList {
             currentCoroutineContext().ensureActive()
             Debug.log(bookSource.bookSourceUrl, "┌获取最新章节", log)
             try {
-                searchBook.latestChapterTitle = analyzeRule.getString(ruleLastChapter)
+                searchBook.latestChapterTitle = io.legado.app.help.book.ChapterPurchaseMarker.normalizeLegacyTitle(analyzeRule.getString(ruleLastChapter))
                 Debug.log(bookSource.bookSourceUrl, "└${searchBook.latestChapterTitle}", log)
             } catch (e: Exception) {
                 currentCoroutineContext().ensureActive()

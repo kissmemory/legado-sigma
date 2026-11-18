@@ -22,7 +22,11 @@ static def releaseTime() {
 def jjIdentityTest = providers.gradleProperty("jjIdentityTest").map { it.toBoolean() }.getOrElse(false)
 
 def name = "legado"
-def version = "3." + releaseTime()
+def customVersion = new Properties()
+if (jjIdentityTest) {
+    rootProject.file('shukuS-version.properties').withInputStream { customVersion.load(it) }
+}
+def version = jjIdentityTest ? customVersion.getProperty('versionName') : "3." + releaseTime()
 def gitCommits = Integer.parseInt('git rev-list HEAD --count'.execute().text.trim())
 
 android {
@@ -52,7 +56,7 @@ android {
         applicationId "io.legado.app"
         minSdk 21
         targetSdk 36
-        versionCode 10000 + gitCommits
+        versionCode jjIdentityTest ? Integer.parseInt(customVersion.getProperty('versionCode')) : 10000 + gitCommits
         versionName version
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         project.ext.set("archivesBaseName", name + "_" + version)

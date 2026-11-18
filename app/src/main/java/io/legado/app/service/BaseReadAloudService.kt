@@ -530,7 +530,7 @@ abstract class BaseReadAloudService : BaseService(),
         nTitle += ": ${ReadBook.book?.name}"
         val metadata = MediaMetadataCompat.Builder()
             .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, cover)
-            .putText(MediaMetadataCompat.METADATA_KEY_TITLE, ReadBook.curTextChapter?.title ?: "null")
+            .putText(MediaMetadataCompat.METADATA_KEY_TITLE, ReadBook.curTextChapter?.getStatusTitle() ?: "null")
             .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, nTitle)
             .putText(MediaMetadataCompat.METADATA_KEY_ALBUM, ReadBook.book?.author ?: "null")
 //            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, nowSpeak.toLong())
@@ -607,7 +607,7 @@ abstract class BaseReadAloudService : BaseService(),
             else -> getString(R.string.read_aloud_t)
         }
         nTitle += ": ${ReadBook.book?.name}"
-        var nSubtitle = ReadBook.curTextChapter?.title
+        var nSubtitle = ReadBook.curTextChapter?.getStatusTitle()
         if (nSubtitle.isNullOrBlank())
             nSubtitle = getString(R.string.read_aloud_s)
         val builder = NotificationCompat
