@@ -101,7 +101,7 @@ android {
             applicationIdSuffix jjIdentityTest ? '.jjidentitytest' : '.debug'
             versionNameSuffix jjIdentityTest ? '-jjid-test' : 'debug'
             if (jjIdentityTest) {
-                manifestPlaceholders.put("app_name", "Sigma 改名识别测试")
+                manifestPlaceholders.put("app_name", "书库S")
             }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'cronet-proguard-rules.pro'

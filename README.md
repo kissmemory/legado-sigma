@@ -1,10 +1,10 @@
-> **本分支为 2026-11-19「晋江改名识别」测试基准**  
-> 应用版本：3.26.111901-jjid-test；独立包名：`io.legado.app.jjidentitytest`。  
-> [下载已验签 APK](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/2026-11-19/Sigma-jj-identity-test-20261119.apk) · [验证记录](releases/2026-11-19/verification.json) · [构建说明](docs/local-fixes/verification.md)
+> **当前定制版：书库S · 3.26.111903-jjid-test**  
+> 全书源通用购买标识：未购买🥚、已购买🐣；保留晋江固定ID识别与详情曾用名功能。  
+> [下载书库S APK](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/2026-11-19-shukus/ShuKuS-20261119.apk) · [更新日志](app/src/main/assets/updateLog.md) · [验证记录](releases/2026-11-19-shukus/verification.json)
 >
-> 后续修改请从此分支的基准提交新建工作分支。包含：晋江固定ID绿点、复用已有书架记录、详情页曾用名及官网文案刷新。手机端尚未实测。未包含手机书架备份、登录数据、电脑编译缓存或本次测试签名私钥。
+> 包名及签名与上一测试版相同，可覆盖更新。完整构建、14项既有回归、签名和内置日志已核验，手机实际Emoji显示和购买状态仍待实测。
 >
-> 应用源码依据 Gitee `lyc486/legado` 的 `8b87c5aba4df91c39a3a0939a68a1180b9f2ee1c` 和本次修复；保留此 GitHub 仓库原有工作流及 Issue 模板，不在本次上传中改动它们。
+> [原始基准提交](https://github.com/kissmemory/legado-sigma/commit/3ac8dfbca9b41aa7e9d36a976703c805a2f8d62e)保留；本分支持续维护后续增量，每次代码修改同提交更新日志。源码依据Gitee `lyc486/legado@8b87c5aba4df91c39a3a0939a68a1180b9f2ee1c`。手机备份、登录数据、编译缓存和本次测试签名私钥不上传。
 
 <div align="center">
 <img width="125" height="125" src="https://gitee.com/lyc486/legado/raw/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" alt="legado"/>

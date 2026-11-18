@@ -6,6 +6,7 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.Menu
 import android.view.MenuItem
+import io.legado.app.BuildConfig
 import io.legado.app.R
 import io.legado.app.base.BaseActivity
 import io.legado.app.databinding.ActivityAboutBinding
@@ -22,6 +23,9 @@ class AboutActivity : BaseActivity<ActivityAboutBinding>() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         binding.llAbout.background = filletBackground
+        if (BuildConfig.APPLICATION_ID.endsWith(".jjidentitytest")) {
+            binding.tvAppName.text = applicationInfo.loadLabel(packageManager)
+        }
         val fTag = "aboutFragment"
         var aboutFragment = supportFragmentManager.findFragmentByTag(fTag)
         if (aboutFragment == null) aboutFragment = AboutFragment()
@@ -53,7 +57,7 @@ class AboutActivity : BaseActivity<ActivityAboutBinding>() {
             R.id.menu_scoring -> openUrl("market://details?id=$packageName")
             R.id.menu_share_it -> share(
                 getString(R.string.app_share_description_sigma),
-                getString(R.string.app_name)
+                applicationInfo.loadLabel(packageManager).toString()
             )
         }
         return super.onCompatOptionsItemSelected(item)

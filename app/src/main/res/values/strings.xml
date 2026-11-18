@@ -1343,4 +1343,6 @@
     <string name="click_image_way">点击图片方式</string>
     <string name="auto_update_summary">每天自动检查软件是否更新</string>
     <string name="shibboleth">口令</string>
+    <string name="chapter_not_purchased">Not purchased</string>
+    <string name="chapter_purchased">Purchased</string>
 </resources>

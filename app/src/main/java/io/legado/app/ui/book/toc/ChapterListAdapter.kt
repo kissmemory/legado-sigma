@@ -124,6 +124,14 @@ class ChapterListAdapter(context: Context, val callback: Callback) :
         payloads: MutableList<Any>
     ) {
         binding.run {
+            // Some sources mark free chapters as isPay=true. Only paid/VIP chapter
+            // rows have a purchase marker; cache/read status stays independent.
+            val showPurchase = item.isVip && !item.isVolume
+            ivLocked.text = if (item.isPay) "🐣" else "🥚"
+            ivLocked.contentDescription = if (showPurchase) {
+                context.getString(if (item.isPay) R.string.chapter_purchased else R.string.chapter_not_purchased)
+            } else null
+            if (showPurchase) ivLocked.visible() else ivLocked.gone()
             val isDur = callback.durChapterIndex() == item.index
             val cached = callback.isLocalBook
                     || item.isVolume
@@ -158,12 +166,6 @@ class ChapterListAdapter(context: Context, val callback: Callback) :
                     tvWordCount.visible()
                 } else {
                     tvWordCount.gone()
-                }
-
-                if (item.isVip && !item.isPay) {
-                    ivLocked.visible()
-                } else {
-                    ivLocked.gone()
                 }
 
                 upHasCache(binding, isDur, cached)

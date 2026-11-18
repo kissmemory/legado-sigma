@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-19",
+  "package": "io.legado.app.jjidentitytest",
+  "label": "书库S",
+  "version": "3.26.111903-jjid-test",
+  "apk": "ShuKuS-20261119.apk",
+  "apk_bytes": 38933727,
+  "apk_sha256": "7fb53c0f7d351ee9839ae1a5e26a8ef9cd9a6b3a8f9fcc62f2e1d63a69548041",
+  "apk_git_blob": "b3b762607c1797b9dfa71f20b4d3b85ce1a6706d",
+  "source_archive": "ShuKuS-source-20261119.zip",
+  "source_bytes": 6797565,
+  "source_sha256": "f6c18bc83c4b0f85716dcbb9ec875f612c7b94b25d49068b54eb3c1ee64e35a5",
+  "source_git_blob": "e2303c5f95bd71e712fda6460bfc5a10066408ec",
+  "certificate_sha256": "8c60657ba4986733fedcc51c157ed989bcf85d7a585713364239dc8ceff14031",
+  "same_signature_as_previous_test": true,
+  "same_package_as_previous_test": true,
+  "embedded_changelog_matches_source": true,
+  "purchase_marker_scope": "all sources, paid/VIP chapters only",
+  "unpaid_marker": "🥚",
+  "purchased_marker": "🐣",
+  "tests": [
+    {
+      "name": "io.legado.app.help.book.JinjiangShelfIdentityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangTitleHistoryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "phone_tested": false,
+  "previous_commit": "b18063594c1d6b9b4ab0393be9d01ed21547fb57",
+  "branch": "custom/jj-identity-20261119"
+}

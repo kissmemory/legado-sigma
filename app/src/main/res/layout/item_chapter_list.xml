@@ -9,19 +9,23 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/iv_locked"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:contentDescription="vip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="32dp"
+        android:minHeight="24dp"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:fontFamily="sans-serif"
         android:paddingEnd="8dp"
-        android:src="@drawable/ic_lock_outline"
+        android:textSize="18sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/secondaryText"
-        tools:ignore="HardcodedText,RtlSymmetry"
+        tools:ignore="RtlSymmetry"
+        tools:text="🥚"
         tools:visibility="visible" />
 
     <TextView
