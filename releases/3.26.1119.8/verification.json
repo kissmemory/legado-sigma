@@ -1,0 +1,16 @@
+{
+  "version": "3.26.1119.8-jjid-test",
+  "versionCode": 10008,
+  "package": "io.legado.app.jjidentitytest",
+  "label": "书库S",
+  "build": "SUCCESS",
+  "tests": 35,
+  "failures": 0,
+  "certificate_sha256": "8c60657ba4986733fedcc51c157ed989bcf85d7a585713364239dc8ceff14031",
+  "apk_sha256": "80b638d52da878883155acf30e0fe9ba10be8b479274e0d58550ee1f7ec9544b",
+  "embedded_changelog_matches_source": true,
+  "phone_installed": false,
+  "phone_ui_tested": false,
+  "phone_write_calls": 0,
+  "computer_tables_modified": false
+}

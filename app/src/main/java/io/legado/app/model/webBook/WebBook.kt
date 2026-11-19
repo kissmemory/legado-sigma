@@ -7,8 +7,7 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.BookSourcePart
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.exception.NoStackTraceException
-import io.legado.app.help.book.BookTitleHistory
-import io.legado.app.help.book.JinjiangShelfIdentity
+import io.legado.app.help.book.BookInfoRefresh
 import io.legado.app.help.book.addType
 import io.legado.app.help.book.removeAllBookType
 import io.legado.app.help.coroutine.Coroutine
@@ -185,9 +184,10 @@ object WebBook {
         book: Book,
         context: CoroutineContext = Dispatchers.IO,
         canReName: Boolean = true,
+        forceFresh: Boolean = false,
     ): Coroutine<Book> {
         return Coroutine.async(scope, context) {
-            getBookInfoAwait(bookSource, book, canReName)
+            getBookInfoAwait(bookSource, book, canReName, forceFresh)
         }
     }
 
@@ -195,7 +195,9 @@ object WebBook {
         bookSource: BookSource,
         book: Book,
         canReName: Boolean = true,
+        forceFresh: Boolean = false,
     ): Book {
+        BookInfoRefresh.prepare(book, forceFresh)
         book.removeAllBookType()
         book.addType(bookSource.getBookType())
         if (!book.infoHtml.isNullOrEmpty()) {
@@ -292,19 +294,8 @@ object WebBook {
         book.removeAllBookType()
         book.addType(bookSource.getBookType())
         return kotlin.runCatching {
-            // Chapter refresh also checks the current public intro/title. Keep errors isolated
-            // and retain the shelf name, progress, groups and handwritten intro.
-            if (!isFromBookInfo && JinjiangShelfIdentity.key(book.bookUrl) != null) {
-                try {
-                    val refreshed = book.copy().apply { infoHtml = null }
-                    getBookInfoAwait(bookSource, refreshed, canReName = false)
-                    book.intro = refreshed.intro
-                    BookTitleHistory.copyFrom(refreshed, book)
-                } catch (error: Exception) {
-                    currentCoroutineContext().ensureActive()
-                    AppLog.put("同步晋江文案失败，保留原文案：${error.localizedMessage}")
-                }
-            }
+            // Keep the native TOC refresh path. Detail rules may contain additional
+            // requests and side effects; do not run them again for every shelf item.
             if (runPerJs) {
                 runPreUpdateJs(bookSource, book, isFromBookInfo).getOrThrow()
             }

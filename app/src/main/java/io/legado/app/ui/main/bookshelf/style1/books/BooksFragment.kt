@@ -106,6 +106,9 @@ class BooksFragment() : BaseFragment(R.layout.fragment_books),
     }
 
     private fun initRecyclerView() {
+        // Bulk refresh can reorder hundreds of rows; overlapping move/change
+        // animations show old covers/text above newly bound rows.
+        binding.rvBookshelf.itemAnimator = null
         binding.rvBookshelf.setEdgeEffectColor(primaryColor)
         upFastScrollerBar()
         binding.refreshLayout.setColorSchemeColors(accentColor)

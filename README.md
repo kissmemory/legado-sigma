@@ -1,16 +1,12 @@
-# 书库S 3.26.1119.7 源码归档
-
-本次增加阅见轮替工作组与准确章节差量同步，显示版本和版本码已递增（10007）。[本版说明](docs/local-fixes/rotation-sync.md) · [修改日志](app/src/main/assets/updateLog.md)。31项相关JVM测试、完整编译及同签名校验通过；真实手机回推尚未测试。本版APK已在本次Codex交付目录提供，仓库内下方链接仍是上一已归档APK，不冒充本版。
-
 # 书库S 自定义版本
 
-当前版本：**3.26.1119.6-jjid-test**，Android 版本码 **10006**。
+当前源码：**3.26.1119.8-jjid-test**，版本码 **10008**。
 
-[下载最新 APK](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/3.26.1119.6/ShuKuS-3.26.1119.6.apk) · [修改日志](app/src/main/assets/updateLog.md) · [阅见专用接口说明](docs/local-fixes/discovery-create-only.md) · [验证记录](releases/3.26.1119.6/verification.json)
+[修改日志](app/src/main/assets/updateLog.md) · [本版刷新修复说明](docs/local-fixes/refresh-regression.md) · [验证记录](releases/3.26.1119.8/verification.json)
 
-新增阅见发现页配套接口：长按手机“Web服务”复制阅见配对码；电脑单独预检、确认后，仅原子新增一本书。核对本机实例、实时分组名/位码与固定作品ID，不覆盖已有书，不调用WebDAV进度同步。配对材料不随书架备份迁移；单源查询保留原生目录与变量；创建操作回执支持只读核对与电脑记录关联。
+修复手动详情刷新复用旧响应，移除批量目录刷新前额外详情请求，避免每本读取整份书架，修正重排时的条目绑定并关闭列表式书架叠影动画。原书源、分组、阅读位置和购买标识保留；完整简介/收藏等数据由详情页刷新。
 
-保留前版购买标识、改名识别、详情曾用名。可覆盖上一书库S测试版。27 项相关回归、完整编译及同签名验证通过；真实手机新增尚未自动执行，需用户安装、配对并显式确认。
+35项相关自动回归、完整构建、同签名验证通过。真实手机界面和联网刷新尚待实测。本版APK在本次Codex交付目录提供，仓库尚未附本版APK。
 
 以下保留上游项目说明。
 

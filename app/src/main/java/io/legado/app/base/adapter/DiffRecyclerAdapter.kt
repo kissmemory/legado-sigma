@@ -143,7 +143,7 @@ abstract class DiffRecyclerAdapter<ITEM, VB : ViewBinding>(protected val context
     ) {
         registerListener(holder, (holder.binding as VB))
         registerItemListener(holder)
-        getItem(holder.layoutPosition)?.let {
+        getItem(position)?.let {
             convert(holder, holder.binding, it, payloads)
         }
     }

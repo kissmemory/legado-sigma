@@ -183,7 +183,7 @@ class BookInfoViewModel(application: Application) : BaseViewModel(application) {
                 }
             }
         }.onFinally {
-            loadBookInfo(book, false)
+            loadBookInfo(book, false, forceFresh = true)
         }.start()
     }
 
@@ -191,7 +191,8 @@ class BookInfoViewModel(application: Application) : BaseViewModel(application) {
         book: Book,
         canReName: Boolean = true,
         runPreUpdateJs: Boolean = true,
-        scope: CoroutineScope = viewModelScope
+        scope: CoroutineScope = viewModelScope,
+        forceFresh: Boolean = false
     ) {
         if (book.isLocal) {
             LocalBook.upBookInfo(book)
@@ -203,7 +204,7 @@ class BookInfoViewModel(application: Application) : BaseViewModel(application) {
                 context.toastOnUi(R.string.error_no_source)
                 return
             }
-            WebBook.getBookInfo(scope, bookSource, book, canReName = canReName)
+            WebBook.getBookInfo(scope, bookSource, book, canReName = canReName, forceFresh = forceFresh)
                 .onSuccess(IO) {
                     val dbBook = appDb.bookDao.getBook(book.name, book.author)
                     if (!inBookshelf && dbBook != null && !dbBook.isNotShelf && dbBook.origin == book.origin) {

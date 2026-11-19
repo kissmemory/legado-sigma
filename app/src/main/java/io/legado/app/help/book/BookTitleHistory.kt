@@ -24,9 +24,7 @@ object BookTitleHistory {
         if (observedName.isBlank()) return
         // A detail opened from discovery/search may have a fresh Book instance. Merge
         // saved history by stable ID before that fresh instance can replace its variables.
-        val shelf = appDb.bookDao.all.filter {
-            !it.isNotShelf && JinjiangShelfIdentity.key(it.bookUrl) == identity
-        }
+        val shelf = matchingShelf(book, appDb.bookDao::getBook) { appDb.bookDao.allBookUrls }
         val seen = linkedSetOf<String>()
         read(book)?.titles?.let(seen::addAll)
         shelf.forEach { saved -> read(saved)?.titles?.let(seen::addAll) }
@@ -34,6 +32,15 @@ object BookTitleHistory {
             ?: shelf.firstOrNull()?.name ?: previousName
         val titles = JinjiangTitleHistory.observe(seen.toList(), seedName, observedName)
         book.putVariable(VARIABLE, GSON.toJson(History(identity, titles, observedName.trim())))
+    }
+
+    internal fun matchingShelf(book: Book, byUrl: (String) -> Book?, allUrls: () -> List<String>): List<Book> {
+        val identity = JinjiangShelfIdentity.key(book.bookUrl) ?: return emptyList()
+        byUrl(book.bookUrl)?.takeIf { !it.isNotShelf }?.let { return listOf(it) }
+        // Alternate source URL: scan lightweight keys, materialize only this work.
+        return allUrls().asSequence().distinct()
+            .filter { JinjiangShelfIdentity.key(it) == identity }
+            .mapNotNull(byUrl).filter { !it.isNotShelf }.toList()
     }
 
     fun displayIntro(book: Book, intro: String?): String? {
