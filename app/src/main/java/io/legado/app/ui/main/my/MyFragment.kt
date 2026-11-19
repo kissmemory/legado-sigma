@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.preference.Preference
+import io.legado.app.api.controller.DiscoveryBridgeController
 import io.legado.app.R
 import io.legado.app.base.BaseFragment
 import io.legado.app.constant.EventBus
@@ -84,10 +85,11 @@ class MyFragment() : BaseFragment(R.layout.fragment_my_config), MainFragmentInte
                 if (!WebService.isRun) {
                     return@onLongClick false
                 }
-                context?.selector(arrayListOf("复制地址", "浏览器打开")) { _, i ->
+                context?.selector(arrayListOf("复制地址", "浏览器打开", "复制阅见配对码")) { _, i ->
                     when (i) {
                         0 -> context?.sendToClip(it.summary.toString())
                         1 -> context?.openUrl(it.summary.toString())
+                        2 -> context?.sendToClip(DiscoveryBridgeController.pairingToken())
                     }
                 }
                 true

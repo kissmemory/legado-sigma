@@ -149,6 +149,10 @@ interface BookDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(vararg book: Book)
 
+    /** Never replaces an existing shelf row, including a concurrent insertion. */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertNewOnly(book: Book): Long
+
     @Update
     fun update(vararg book: Book)
 

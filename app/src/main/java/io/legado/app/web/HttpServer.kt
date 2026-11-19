@@ -2,6 +2,7 @@ package io.legado.app.web
 
 import android.graphics.Bitmap
 import fi.iki.elonen.NanoHTTPD
+import io.legado.app.api.controller.DiscoveryBridgeController
 import io.legado.app.api.ReturnData
 import io.legado.app.api.controller.BookController
 import io.legado.app.api.controller.BookSourceController
@@ -28,6 +29,10 @@ class HttpServer(port: Int) : NanoHTTPD(port) {
         val ct = ContentType(session.headers["content-type"]).tryUTF8()
         session.headers["content-type"] = ct.contentTypeHeader
         var uri = session.uri
+        val discoveryRoute = uri == "/getDiscoveryBridgeInfo" || uri == "/createDiscoveryBook" || uri == "/resolveDiscoveryBook"
+        if (discoveryRoute && (session.headers["origin"] != null || !DiscoveryBridgeController.authorized(session.headers["x-discovery-pairing"]))) {
+            return newFixedLengthResponse(Response.Status.FORBIDDEN, "application/json", "{\"isSuccess\":false,\"errorMsg\":\"需要在手机长按Web服务复制阅见配对码\"}")
+        }
 
         val startAt = System.currentTimeMillis()
         LogUtils.d(TAG) {
@@ -55,6 +60,8 @@ class HttpServer(port: Int) : NanoHTTPD(port) {
                             "/saveBookSource" -> BookSourceController.saveSource(postData)
                             "/saveBookSources" -> BookSourceController.saveSources(postData)
                             "/deleteBookSources" -> BookSourceController.deleteSources(postData)
+                            "/resolveDiscoveryBook" -> DiscoveryBridgeController.resolve(postData)
+                            "/createDiscoveryBook" -> DiscoveryBridgeController.create(postData)
                             "/saveBook" -> BookController.saveBook(postData)
                             "/deleteBook" -> BookController.deleteBook(postData)
                             "/saveBookProgress" -> BookController.saveBookProgress(postData)
@@ -77,6 +84,7 @@ class HttpServer(port: Int) : NanoHTTPD(port) {
                     returnData = when (uri) {
                         "/getBookSource" -> BookSourceController.getSource(parameters)
                         "/getBookSources" -> BookSourceController.sources
+                        "/getDiscoveryBridgeInfo" -> DiscoveryBridgeController.info()
                         "/getBookshelf" -> BookController.bookshelf
                         "/getChapterList" -> BookController.getChapterList(parameters)
                         "/refreshToc" -> BookController.refreshToc(parameters)
@@ -130,8 +138,10 @@ class HttpServer(port: Int) : NanoHTTPD(port) {
                     newFixedLengthResponse(GSON.toJson(returnData))
                 }
             }
-            response.addHeader("Access-Control-Allow-Methods", "GET, POST")
-            response.addHeader("Access-Control-Allow-Origin", session.headers["origin"])
+            if (!discoveryRoute) {
+                response.addHeader("Access-Control-Allow-Methods", "GET, POST")
+                response.addHeader("Access-Control-Allow-Origin", session.headers["origin"])
+            }
             LogUtils.d(TAG) {
                 "${session.method.name} - $uri - ${session.queryParameterString} - End($startAt)"
             }

@@ -46,7 +46,8 @@ public final class JinjiangShelfIdentity {
             if (path == null) return null;
             String id = null;
             if (host.equals("jjwxc.net") || host.endsWith(".jjwxc.net") ||
-                    host.equals("jjwxc.org") || host.endsWith(".jjwxc.org")) {
+                    host.equals("jjwxc.org") || host.endsWith(".jjwxc.org") ||
+                    host.equals("jjwxc.com") || host.endsWith(".jjwxc.com")) {
                 if (!path.equalsIgnoreCase("/onebook.php") &&
                         !path.equalsIgnoreCase("/androidapi/novelbasicinfo")) return null;
                 String query = uri.getRawQuery();

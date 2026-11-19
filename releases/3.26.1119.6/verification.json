@@ -1,0 +1,47 @@
+{
+  "version": "3.26.1119.6-jjid-test",
+  "versionCode": 10006,
+  "apk_bytes": 39057705,
+  "apk_git_blob": "6876247cedac7f696c023756daccca4436d5df34",
+  "apk_sha256": "2c7b8e41bcd0e20176ccecd115ea6e6615844072e8e536776182a79fcb57c6c1",
+  "tests": [
+    {
+      "name": "io.legado.app.help.book.ChapterPurchaseMarkerTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.CurrentChapterMarkerTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.DiscoveryBookIdentityTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangShelfIdentityTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0"
+    },
+    {
+      "name": "io.legado.app.help.book.JinjiangTitleHistoryTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0"
+    }
+  ],
+  "phone_tested": false,
+  "embedded_changelog_matches_source": true,
+  "package": "io.legado.app.jjidentitytest",
+  "label": "书库S",
+  "certificate_sha256": "8c60657ba4986733fedcc51c157ed989bcf85d7a585713364239dc8ceff14031",
+  "same_signature_as_previous_test": true,
+  "computer_discovery_tests": 52,
+  "real_phone_write_calls": 0
+}

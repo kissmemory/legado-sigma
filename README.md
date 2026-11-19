@@ -1,14 +1,12 @@
 # 书库S 自定义版本
 
-当前版本：**3.26.1119.5-jjid-test**，Android 版本码 **10005**。
+当前版本：**3.26.1119.6-jjid-test**，Android 版本码 **10006**。
 
-[下载最新 APK](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/3.26.1119.5/ShuKuS-3.26.1119.5.apk) · [修改日志](app/src/main/assets/updateLog.md) · [购买标识核对清单](docs/local-fixes/purchase-display-audit.md) · [验证记录](releases/3.26.1119.5/verification.json)
+[下载最新 APK](https://github.com/kissmemory/legado-sigma/raw/refs/heads/custom/jj-identity-20261119/releases/3.26.1119.6/ShuKuS-3.26.1119.6.apk) · [修改日志](app/src/main/assets/updateLog.md) · [阅见专用接口说明](docs/local-fixes/discovery-create-only.md) · [验证记录](releases/3.26.1119.6/verification.json)
 
-整体核对目录、书架与详情摘要，补齐阅读菜单、朗读通知/媒体标题，修复 Web/WebDAV 同步及书籍信息刷新可能覆盖购买标识的问题；发现/搜索中的明确旧锁前缀统一转换。未知购买状态不推测。
+新增阅见发现页配套接口：长按手机“Web服务”复制阅见配对码；电脑单独预检、确认后，仅原子新增一本书。核对本机实例、实时分组名/位码与固定作品ID，不覆盖已有书，不调用WebDAV进度同步。配对材料不随书架备份迁移；单源查询保留原生目录与变量；创建操作回执支持只读核对与电脑记录关联。
 
-覆盖安装后刷新一次目录。保留分组、类别和阅读位置；原始章节标题、正文、编辑及导出不加装饰。24 项回归测试及同签名验证通过；手机实际显示仍待实测。
-
-每次发布使用 build-test.ps1 自动递增显示版本号和版本码，并同步修改日志。开发重复验证可显式使用 -ReuseVersion。
+保留前版购买标识、改名识别、详情曾用名。可覆盖上一书库S测试版。27 项相关回归、完整编译及同签名验证通过；真实手机新增尚未自动执行，需用户安装、配对并显式确认。
 
 以下保留上游项目说明。
 
