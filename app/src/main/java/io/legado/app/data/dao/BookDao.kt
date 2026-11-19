@@ -156,6 +156,12 @@ interface BookDao {
     @Update
     fun update(vararg book: Book)
 
+    @Query("UPDATE books SET `group` = :groups WHERE bookUrl = :url")
+    fun updateDiscoveryWorkGroups(url: String, groups: Long)
+
+    @Query("UPDATE books SET `group` = :groups, durChapterIndex = :chapterIndex, durChapterPos = 0, durChapterTitle = :chapterTitle, durChapterTime = :updatedAt WHERE bookUrl = :url")
+    fun updateDiscoverySyncFields(url: String, groups: Long, chapterIndex: Int, chapterTitle: String?, updatedAt: Long)
+
     @Delete
     fun delete(vararg book: Book)
 

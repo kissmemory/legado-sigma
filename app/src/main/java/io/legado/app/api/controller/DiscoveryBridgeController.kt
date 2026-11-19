@@ -39,6 +39,7 @@ object DiscoveryBridgeController {
         return values
     }
     private fun deviceId(): String = credentials(true).getProperty("deviceId")
+    internal fun instanceId(): String = deviceId()
     fun pairingToken(): String = credentials(true).getProperty("pairing")
     fun authorized(value: String?): Boolean {
         val saved = credentials(false).getProperty("pairing") ?: return false
@@ -62,7 +63,7 @@ object DiscoveryBridgeController {
     }
 
     fun info(): ReturnData = ReturnData().setData(mapOf(
-        "protocol" to 1, "atomicCreateOnly" to true, "noWebDav" to true,
+        "protocol" to 1, "atomicCreateOnly" to true, "noWebDav" to true, "atomicShelfDelta" to true,
         "deviceId" to deviceId(), "packageName" to appCtx.packageName,
         "appName" to appCtx.applicationInfo.loadLabel(appCtx.packageManager).toString(),
         "versionName" to BuildConfig.VERSION_NAME,
